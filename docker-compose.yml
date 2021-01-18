@@ -1,0 +1,17 @@
+version: "3"
+services:
+    vita-intellectus:
+        container_name: vita-intellectus
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 8004:8004
+        environment: 
+            DB_CONNECTION_STRING: postgres://username:password@postgres-db:5432/vita
+        networks:
+            - backend-network
+    
+networks:
+    backend-network:
+        external: true
