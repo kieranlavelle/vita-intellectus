@@ -22,6 +22,7 @@ func connectToDatabase() *pgx.Conn {
 
 func healthCheck(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "Ok"})
+	return
 }
 
 // CreateRoutes forms a database connecting and sets up the API routes.
@@ -38,7 +39,7 @@ func CreateRoutes() {
 	router.Use(cors.Default())
 
 	// version the api
-	router.POST("/health_check", healthCheck)
+	router.GET("/health_check", healthCheck)
 	router.Run("0.0.0.0:8004")
 
 }
