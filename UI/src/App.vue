@@ -4,21 +4,23 @@
       app
       color="primary"
       dark
+      v-if="loggedIn()"
     >
       <div class="d-flex align-center">
         <h1>Vita</h1>
       </div>
 
       <v-spacer></v-spacer>
+      <Menu></Menu>
 
-      <v-btn
-        href=""
+      <!-- <v-btn
+        @click="logout"
         target="_blank"
         text
       >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+        <span class="mr-2">Logout</span>
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main>
@@ -28,18 +30,22 @@
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld';
-// import SignUpComponent from './components/SignUpComponent'
+
+import Menu from './components/Menu'
 
 export default {
   name: 'App',
 
   components: {
-    // SignUpComponent,
+    Menu
   },
 
   data: () => ({
-    //
   }),
+  methods: {
+    loggedIn: function() {
+      return window.localStorage.getItem('token') != "null"
+    }
+  }
 };
 </script>

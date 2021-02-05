@@ -66,8 +66,10 @@
                               vm.message = "Logged In."
                               vm.accountCreated = true;
 
+
                               //set the token
                               window.localStorage.setItem('token', res.data.access_token);
+                              window.localStorage.setItem('username', res.data.username);
                               vm.$router.push('home');
                           } else {
                               vm.message = "Invalid Credentials."

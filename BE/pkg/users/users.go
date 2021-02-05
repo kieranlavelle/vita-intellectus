@@ -10,22 +10,39 @@ import (
 type User struct {
 	UserID   int
 	Username string
-	Email    string
 }
 
 // GetUser get's the full user from the database using the username and email
-func GetUser(conn *pgx.Conn, username string, email string) (User, error) {
+func GetUser(conn *pgx.Conn, username string) (User, error) {
 	// need to insert the user into the database for this app
-	var userID int
+	userID := -1
 	err := conn.QueryRow(
 		context.Background(),
-		"insert into users (username, email) VALUES ($1, $2) RETURNING user_id",
-		username, email,
+		"SELECT user_id FROM users where username=$1",
+		username,
+	).Scan(&userID)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			break
+		default:
+			return User{}, err
+		}
+	}
+
+	if userID != -1 {
+		return User{UserID: userID, Username: username}, nil
+	}
+
+	err = conn.QueryRow(
+		context.Background(),
+		"insert into users (username) VALUES ($1) RETURNING user_id",
+		username,
 	).Scan(&userID)
 
 	if err != nil {
 		return User{}, err
 	}
 
-	return User{UserID: userID, Username: username, Email: email}, nil
+	return User{UserID: userID, Username: username}, nil
 }

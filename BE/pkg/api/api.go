@@ -26,7 +26,9 @@ func connectToDatabase() *pgx.Conn {
 // AddDatabaseConnection add's a connection to the request context
 func AddDatabaseConnection(conn *pgx.Conn) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("databaseConnection", conn)
+		if c.Request.Method != "OPTIONS" {
+			c.Set("databaseConnection", conn)
+		}
 		c.Next()
 	}
 }
@@ -34,14 +36,16 @@ func AddDatabaseConnection(conn *pgx.Conn) gin.HandlerFunc {
 // AddUser add's a user object to the request context
 func AddUser(conn *pgx.Conn) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.GetHeader("X-Authenticated-UserId")
-		user, err := users.GetUser(conn, username, "")
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
-			return
-		}
+		if c.Request.Method != "OPTIONS" {
+			username := c.GetHeader("X-Authenticated-UserId")
+			user, err := users.GetUser(conn, username)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
+				return
+			}
 
-		c.Set("user", user)
+			c.Set("user", user)
+		}
 		c.Next()
 	}
 }
@@ -62,12 +66,20 @@ func CreateRoutes() {
 	defer connection.Close(context.Background())
 
 	router := gin.Default()
-	router.Use(cors.Default())
+	// router.Use(cors.Default())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"*"},
+		AllowHeaders: []string{"*"},
+	}))
+
 	router.Use(AddDatabaseConnection(connection))
 	router.Use(AddUser(connection))
 
 	// version the api
 	router.GET("/health_check", healthCheck)
-	router.POST("/habbits", habbits.CreateHabbit)
+	router.POST("/habbits", habbits.AddHabbit)
+	router.GET("/habbits", habbits.GetHabbits)
 	router.Run("0.0.0.0:8004")
 }
