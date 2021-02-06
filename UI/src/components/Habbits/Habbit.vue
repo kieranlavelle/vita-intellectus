@@ -22,7 +22,7 @@
                         <v-icon
                             medium
                             :color="completed ? 'light-green' : ''"
-                            @click="complete"
+                            @click.stop="complete"
                         >
                             mdi-check-bold
                         </v-icon>

@@ -1,7 +1,9 @@
 <template>
     <v-container fill-height fluid>
         <v-row align="center" justify="center" dense>
-            <v-col cols="3">
+            <v-col 
+                :cols="cols"
+            >
                 <div class="login-form">
                     <v-col align="center"><h2>Login</h2></v-col>
                     <v-col align="center">
@@ -85,6 +87,19 @@
                       })
         }
     },
+    computed: {
+      cols () {
+        console.log(this.$vuetify.breakpoint.name)
+        switch (this.$vuetify.breakpoint.name) {
+            case 'xs': return "10"
+            case 'sm': return "6"
+            case 'md': return "6"
+            case 'lg': return "3"
+            case 'xl': return "3"
+        }
+        return "3"
+      },
+    }
     }
 </script>
 

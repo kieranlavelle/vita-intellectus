@@ -52,14 +52,17 @@ export default {
 
   data: () => ({
     links: [
-      "Dashboard",
       "Habbits"
     ],
     initial: "",
   }),
   methods: {
     loggedIn: function() {
-      return window.localStorage.getItem('token') != "null"
+      var loggedIn = window.localStorage.getItem('token') != "null"
+      if (!loggedIn) {
+        this.$router.push('login');
+      }
+      return loggedIn;
     },
     navigate: function(destination) {
       this.$router.push(destination.toLowerCase());

@@ -10,7 +10,9 @@
                 v-for="habbit in habbits"
                 :key="habbit.habbit_id"
                 v-bind="habbit"
+                
                 class="habbit"
+                :class="{isMobile: mobile, isTablet: tablet, isComputer: computer}"
             />
         </v-row>
     </v-container>
@@ -42,15 +44,27 @@ export default {
             .catch(error => (this.errorGettingHabbits = true))
         }
     },
-    created: async function(){
-        console.log(window.localStorage.getItem('token'))
-        if(window.localStorage.getItem('token') == "null"){
-            this.$router.push('login');
-        }
-
+    mounted: async function(){
         API.get("habbits")
            .then(response => (this.habbits = response.data))
            .catch(error => (this.errorGettingHabbits = true))
+    },
+    computed: {
+        isMobile() {
+            return this.$vuetify.breakpoint.name == "xs";
+        },
+        isTablet() {
+            let breakpoint = this.$vuetify.breakpoint.name;
+            let tablets = ["sm", "md"]
+
+            return tablets.includes(breakpoint);
+        },
+        isComputer() {
+            let breakpoint = this.$vuetify.breakpoint.name;
+            let computers = ["lg", "xl"]
+
+            return computers.includes(breakpoint);
+        }
     }
 }
 </script>
@@ -63,8 +77,19 @@ export default {
 }
 
 .habbit {
-    max-width: 32%;
     margin: 0px;
+}
+
+.computer {
+    max-width: 32%;
+}
+
+.mobile {
+    max-width: 80%;
+}
+
+.tablet {
+    max-width: 50%;
 }
 
 
