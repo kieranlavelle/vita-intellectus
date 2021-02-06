@@ -11,7 +11,7 @@ import (
 func HabbitsByUser(conn *pgx.Conn, userID int) pgx.Rows {
 	rows, _ := conn.Query(
 		context.Background(),
-		"SELECT habbit_id, user_id, name, last_completed FROM habbits WHERE user_id=$1",
+		"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1",
 		userID,
 	)
 	return rows
@@ -55,6 +55,21 @@ func UpdateLastCompleted(conn *pgx.Conn, habbitID int) error {
 		context.Background(),
 		"UPDATE habbits SET last_completed=$1 WHERE habbit_id=$2",
 		time.Now().UTC(), habbitID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteHabbit removes the habbit if the user owns in
+func DeleteHabbit(conn *pgx.Conn, userID int, habbitID int) error {
+	_, err := conn.Exec(
+		context.Background(),
+		"DELETE FROM habbits WHERE habbit_id=$1 AND user_id=$2",
+		habbitID, userID,
 	)
 
 	if err != nil {

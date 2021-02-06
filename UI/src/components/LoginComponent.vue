@@ -78,6 +78,9 @@
                           }
                       })
                       .catch((error) => {
+                            vm.message = "Invalid Credentials."
+                            vm.accountCreated = false;
+                            vm.accountCreatedError = true;
                           console.log(error);
                       })
         }

@@ -12,35 +12,12 @@
                 v-on="on"
                 text
             >
-                <v-icon>mdi-dots-vertical</v-icon>
+                <v-icon>mdi-cog-outline</v-icon>
             </v-btn>
         </template>
 
         <v-card>
-            <v-list>
-                <v-list-item>
-                    <v-list-item-content>
-                        <v-list-item-title>Kieran Lavelle</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-
-                <v-divider></v-divider>
-
-                <v-list-item>
-                    <v-list-item-content>
-                        <v-list-item-action class="text-center">
-                            <router-link to="/habbits">Habbits</router-link>
-                        </v-list-item-action>
-                    </v-list-item-content>
-                </v-list-item>
-
-
-            </v-list>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-                <v-spacer></v-spacer>
+            <v-card-actions class="justify-center">
                 <v-btn
                     text
                     @click="logout"

@@ -82,6 +82,7 @@ func CreateRoutes() {
 	router.POST("/habbits", habbits.AddHabbit)
 	router.GET("/habbits", habbits.GetHabbits)
 	router.PUT("/habbits/complete", habbits.CompleteHabbit)
+	router.DELETE("/habbit/:habbitID", habbits.DeleteHabbit)
 
 	router.Run("0.0.0.0:8004")
 }

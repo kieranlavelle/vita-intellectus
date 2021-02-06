@@ -1,42 +1,66 @@
 <template>
-    <v-container fluid full-height>
-        <v-row class="nav-row">
-            <v-btn
-                color="deep-purple lighten-3"
-            >
-                New Habbit
-            </v-btn>
+    <v-container fluid class="habbits-view">
+        <v-row
+            @newhabbit="reloadHabits"
+        >
+            <new-habbit />
         </v-row>
-        
-        <v-row class="habbit-holder">
-            <v-col>
-                <HabbitDrawer />
-            </v-col>
+        <v-row>
+            <habbit
+                v-for="habbit in habbits"
+                :key="habbit.habbit_id"
+                v-bind="habbit"
+                class="habbit"
+            />
         </v-row>
-
     </v-container>
 </template>
 
 <script>
-import HabbitDrawer from '../components/Habbits/HabbitDrawer'
+import { API } from '../endpoints/http-config'
+
+import habbit from '../components/Habbits/Habbit'
+import newHabbit from '../components/Habbits/NewHabbit'
 
 export default {
     name: "Habbits",
     components: {
-        HabbitDrawer
+        habbit,
+        newHabbit
+    },
+    data: () => ({
+        habbits: [],
+        errorGettingHabbits: false,
+    }),
+    methods: {
+        hasHabbits: function() {
+            return this.habbits.length > 0;
+        },
+        reloadHabits: function() {
+            API.get("habbits")
+            .then(response => (this.habbits = response.data))
+            .catch(error => (this.errorGettingHabbits = true))
+        }
+    },
+    created: async function(){
+        API.get("habbits")
+           .then(response => (this.habbits = response.data))
+           .catch(error => (this.errorGettingHabbits = true))
     }
 }
 </script>
 
 <style scoped>
 
-.nav-row {
-    padding-left: 120px;
-    padding-top: 50px;
+.habbits-view {
+    background-color: rgb(216, 216, 216);
+    padding: 25px 25px 50px 50px;
 }
 
-.habbit-holder {
-    padding: 0px 15px 50px 50px;
+.habbit {
+    max-width: 32%;
+    margin: 0px;
 }
+
 
 </style>
