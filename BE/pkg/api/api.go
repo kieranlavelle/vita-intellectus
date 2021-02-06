@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
 
@@ -67,11 +66,11 @@ func CreateRoutes() {
 	router := gin.Default()
 	// router.Use(cors.Default())
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"*"},
-		AllowHeaders: []string{"*"},
-	}))
+	// router.Use(cors.New(cors.Config{
+	// 	AllowOrigins: []string{"*"},
+	// 	AllowMethods: []string{"*"},
+	// 	AllowHeaders: []string{"*"},
+	// }))
 
 	router.Use(AddDatabaseConnection(connection))
 	router.Use(AddUser(connection))
