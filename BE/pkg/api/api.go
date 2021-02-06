@@ -43,7 +43,6 @@ func AddUser(conn *pgx.Conn) gin.HandlerFunc {
 				c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
 				return
 			}
-
 			c.Set("user", user)
 		}
 		c.Next()
@@ -79,7 +78,10 @@ func CreateRoutes() {
 
 	// version the api
 	router.GET("/health_check", healthCheck)
+
 	router.POST("/habbits", habbits.AddHabbit)
 	router.GET("/habbits", habbits.GetHabbits)
+	router.PUT("/habbits/complete", habbits.CompleteHabbit)
+
 	router.Run("0.0.0.0:8004")
 }
