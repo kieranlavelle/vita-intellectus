@@ -2,42 +2,39 @@ package habbits
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v4"
-	"github.com/mitchellh/mapstructure"
 
 	"github.com/kieranlavelle/vita-intellectus/pkg/helpers"
+	"github.com/kieranlavelle/vita-intellectus/pkg/persistence"
 	"github.com/kieranlavelle/vita-intellectus/pkg/users"
 )
 
-// HabbitSchedule specifies times for a habbit to be formed
-type HabbitSchedule struct {
-	ScheduleID int      `json:"schedule_id"`
-	UserID     int      `json:"user_id"`
-	Name       string   `json:"name" validate:"required"`
-	Days       []string `json:"days" validate:"required"`
-	Times      []string `json:"times"`
-}
-
 // Habbit represents a habbit a user wants to set
 type Habbit struct {
-	HabbitID    int            `json:"habbit_id"`
-	UserID      int            `json:"user_id"`
-	Name        string         `json:"name"`
-	HasSchedule bool           `json:"has_schedule"`
-	Schedule    HabbitSchedule `json:"schedule"`
+	HabbitID       int      `json:"habbit_id"`
+	UserID         int      `json:"user_id"`
+	Name           string   `json:"name"`
+	Days           []string `json:"days"`
+	CompletedToday bool     `json:"completed_today"`
+}
+
+// CompleteHabbitBody represents the body expected by the completeHabbit request
+type CompleteHabbitBody struct {
+	HabbitID int `json:"habbit_id"`
 }
 
 // createHabbit does validation and creates a habbit struct
 func createHabbit(jsonStr []byte, user users.User) (Habbit, error) {
 
-	validate := validator.New()
+	habbit := Habbit{}
 
 	requestBody := make(map[string]interface{})
 	err := json.Unmarshal(jsonStr, &requestBody)
@@ -45,29 +42,14 @@ func createHabbit(jsonStr []byte, user users.User) (Habbit, error) {
 		return Habbit{}, err
 	}
 
-	habbit := Habbit{}
-	schedule := HabbitSchedule{}
-
-	if val, ok := requestBody["schedule"]; ok {
-		mapstructure.Decode(val, &schedule)
-		validate.Struct(&schedule)
-		habbit.HasSchedule = true
-	}
-
 	if val, ok := requestBody["name"]; ok {
 		habbit.Name = val.(string)
 		habbit.UserID = user.UserID
-		schedule.UserID = user.UserID
 	} else {
 		return Habbit{}, errors.New("A habbit must have a name")
 	}
 
-	if habbit.HasSchedule {
-		habbit.Schedule = schedule
-	}
-
 	return habbit, nil
-
 }
 
 // AddHabbit creates a new habbit for the user in the database
@@ -94,87 +76,79 @@ func AddHabbit(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
 	}
 
-	// Check if this schedule exists. If it does get ID
-	if habbit.HasSchedule {
-		scheduleID, err := getScheduleID(conn, habbit.Schedule)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"detail": err.Error()})
-		}
-		habbit.Schedule.ScheduleID = scheduleID
-
-		err = conn.QueryRow(
-			context.Background(),
-			"insert into habbits (user_id, name, schedule_id) VALUES ($1, $2, $3) RETURNING habbit_id",
-			user.UserID, habbit.Name, habbit.Schedule.ScheduleID,
-		).Scan(&habbit.HabbitID)
-
-	} else {
-		err = conn.QueryRow(
-			context.Background(),
-			"insert into habbits (user_id, name, schedule_id) VALUES ($1, $2) RETURNING habbit_id",
-			user.UserID, habbit.Name,
-		).Scan(&habbit.HabbitID)
-	}
+	err = conn.QueryRow(
+		context.Background(),
+		"insert into habbits (user_id, name) VALUES ($1, $2) RETURNING habbit_id",
+		user.UserID, habbit.Name,
+	).Scan(&habbit.HabbitID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"detail": "internal server error"})
 	}
 
 	habbit.UserID = user.UserID
-
 	c.JSON(http.StatusOK, habbit)
 
 }
 
 // GetHabbits get's every habbit for a user
 func GetHabbits(c *gin.Context) {
-	conn, ok := c.MustGet("databaseConnection").(*pgx.Conn)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
-		return
-	}
-	user, ok := c.MustGet("user").(users.User)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
-		return
-	}
 
+	var habbit Habbit
 	var habbits []Habbit
-	var scheduleIDs []*int
+	var lastCompleted sql.NullTime
 
-	// need to load the habbitSchedule in
-	rows, _ := conn.Query(
-		context.Background(),
-		"SELECT habbit_id, user_id, name, schedule_id FROM habbits WHERE user_id=$1",
-		user.UserID,
-	)
+	if conn, err := helpers.DatabaseConnection(c); err == nil {
+		if user, err := helpers.RequestUser(c); err == nil {
 
-	for rows.Next() {
-		habbit := Habbit{}
-		var scheduleID *int
-		err := rows.Scan(&habbit.HabbitID, &habbit.UserID, &habbit.Name, &scheduleID)
-		if helpers.ErrorExit(err, c, "failed to get habbits", http.StatusBadRequest) {
-			return
-		}
+			rows := persistence.HabbitsByUser(conn, user.UserID)
+			for rows.Next() {
+				err := rows.Scan(&habbit.HabbitID, &habbit.UserID, &habbit.Name, &lastCompleted)
+				if err != nil {
+					c.AbortWithStatus(http.StatusInternalServerError)
+				}
 
-		scheduleIDs = append(scheduleIDs, scheduleID)
-		habbits = append(habbits, habbit)
-	}
+				lYear, lMonth, lday := lastCompleted.Time.Date()
+				year, month, day := time.Now().Date()
 
-	for index, scheduleID := range scheduleIDs {
-		if scheduleID != nil {
-			schedule, err := getScheduleByID(conn, scheduleID)
-			if helpers.ErrorExit(err, c, "failed to get habbit schedule", http.StatusBadRequest) {
-				return
+				validYear := lYear == year
+				validMonth := lMonth == month
+				validDay := lday == day
+
+				if validDay && validMonth && validYear {
+					habbit.CompletedToday = true
+				} else {
+					habbit.CompletedToday = false
+				}
+
+				// add the habbit into a slice
+				habbits = append(habbits, habbit)
 			}
-
-			habbits[index].HasSchedule = true
-			habbits[index].Schedule = schedule
-		} else {
-			habbits[index].HasSchedule = false
-			habbits[index].Schedule = HabbitSchedule{}
 		}
 	}
 
 	c.JSON(http.StatusOK, habbits)
+}
+
+// CompleteHabbit add's a habbit_completion
+func CompleteHabbit(c *gin.Context) {
+	if conn, err := helpers.DatabaseConnection(c); err == nil {
+		completeHabbitBody := CompleteHabbitBody{}
+		c.BindJSON(&completeHabbitBody)
+
+		err := persistence.AddTrackedHabbit(conn, completeHabbitBody.HabbitID)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+		}
+
+		err = persistence.UpdateLastCompleted(conn, completeHabbitBody.HabbitID)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+		}
+
+		c.AbortWithStatus(http.StatusOK)
+		return
+	}
+
+	c.AbortWithStatus(http.StatusInternalServerError)
 }
