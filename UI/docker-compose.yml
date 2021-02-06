@@ -1,6 +1,6 @@
 version: '3'
 services:
-  identity-fe:
+  vita-fe:
     container_name: vita-fe
     build:
       context: .

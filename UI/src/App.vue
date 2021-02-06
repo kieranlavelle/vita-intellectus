@@ -26,16 +26,6 @@
 
         <v-spacer></v-spacer>
         <Menu />
-
-        <!-- <v-responsive max-width="260">
-          <v-text-field
-            dense
-            flat
-            hide-details
-            rounded
-            solo-inverted
-          ></v-text-field>
-        </v-responsive> -->
       </v-container>
     </v-app-bar>
 

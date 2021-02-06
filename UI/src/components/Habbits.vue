@@ -43,6 +43,11 @@ export default {
         }
     },
     created: async function(){
+        console.log(window.localStorage.getItem('token'))
+        if(window.localStorage.getItem('token') == "null"){
+            this.$router.push('login');
+        }
+
         API.get("habbits")
            .then(response => (this.habbits = response.data))
            .catch(error => (this.errorGettingHabbits = true))

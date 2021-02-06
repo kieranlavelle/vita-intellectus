@@ -6,5 +6,10 @@
 <script>
 export default {
     name: "Dashboard",
+    mounted(){
+        if(window.localStorage.getItem('username') == "null"){
+            this.$router.push('login');
+        }
+    }
 }
 </script>

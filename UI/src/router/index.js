@@ -5,8 +5,6 @@ import LoginComponent from "../components/LoginComponent.vue"
 import SignUpComponent from "../components/SignUpComponent.vue"
 import Habbits from "../components/Habbits.vue"
 
-Vue.use(VueRouter);
-
 const routes = [
   {
     path: "/",
