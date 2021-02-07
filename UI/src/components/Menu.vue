@@ -38,7 +38,12 @@ export default {
     methods: {
         logout: function() {
             this.menu = false;
-            window.localStorage.setItem('token', "null")
+            
+            this.$store.commit('setToken', null);
+            this.$store.commit('setUser', null);
+
+            this.$store.commit('logout');
+            sessionStorage.clear();
             this.$router.push('login');
         }
     }

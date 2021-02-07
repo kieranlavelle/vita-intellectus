@@ -65,14 +65,9 @@ import { AUTH } from '../endpoints/http-config'
             AUTH.post("/login", formData)
                 .then(response => {
                     this.message = "Logged In";
-
-                    console.log("Loggin In")
-                    console.log(response)
                     this.$store.commit('setToken', response.data.access_token);
                     this.$store.commit('setUser', response.data.username);
-
-                    console.log(`Store Value: ${this.$store.getters.token}`)
-
+                    this.$store.commit('login')
                     this.$router.push('habbits');
                 })
                 .catch((error) => {

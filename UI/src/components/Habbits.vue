@@ -45,8 +45,6 @@ export default {
         }
     },
     beforeMount: async function(){
-        console.log("Calling before mount")
-
         this.config = {
             headers: {
                 Authorization: `Bearer ${this.$store.getters.token}`

@@ -4,7 +4,7 @@
       app
       color="white"
       flat
-      v-if="loggedIn"
+      v-if="this.$store.getters.loggedIn"
     >
       <v-container class="py-0 fill-height fluid">
         <v-avatar
@@ -62,8 +62,8 @@ export default {
         },
         checkToken: function() {
 
-            if (this.$store.getters.token == "") {
-                this.loggedIn = false;
+            if (this.$store.getters.token == null) {
+                this.$store.commit('logout');
                 if (this.$route.name != 'login'){
                     this.$router.push('login');
                 }
@@ -79,12 +79,13 @@ export default {
             AUTH.put("/refresh", {}, config)
                 .then(response => {
                     if (response.status == 200) {
-                        this.loggedIn = true;
                         this.$store.commit('setToken', response.headers.token)
                     }
                 })
                 .catch(response => {
-                    this.loggedIn = false;
+                    this.$store.commit('logout');
+                    sessionStorage.clear();
+
                     this.$store.commit('setToken', null);
                     this.$store.commit('setUser', null);
 
@@ -95,14 +96,16 @@ export default {
         }
     },
     created: function(){
-        let username = window.localStorage.getItem("username");
-        this.initial = username.charAt(0).toUpperCase();
+        let username = this.$store.getters.username;
+        if (username != null) {
+            this.initial = username.charAt(0).toUpperCase();
+        }
     },
     beforeMount: function() {
         this.checkToken();
         window.setInterval(() => {
             this.checkToken();
-        }, 1000*10*1)
+        }, 1000*60*10)
     }
 };
 </script>
