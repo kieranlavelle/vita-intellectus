@@ -5,6 +5,7 @@
             :name="name"
             :days="days"
             :habbit_id="habbit_id"
+            @delete="$emit('delete')"
         />
         <v-card
             outlined

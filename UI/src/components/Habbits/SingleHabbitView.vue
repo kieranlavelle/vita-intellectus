@@ -87,13 +87,21 @@ export default {
             this.disableEditing = !this.disableEditing;
         },
         remove() {
-            API.delete("/habbit/"+this.habbit_id)
-               .then(response => this.show=false)
+            API.delete("/habbit/"+this.habbit_id, this.config)
+               .then(response => {
+                 this.show=false;
+                 this.$emit('delete');
+               })
                .catch(error => console.log(error))
         }
     },
     mounted(){
         this.selectedDays = this.days;
+        this.config = {
+          headers: {
+            Authorization: `Bearer ${this.$store.getters.token}`
+          }
+        }
     },
     computed: {
         show: {

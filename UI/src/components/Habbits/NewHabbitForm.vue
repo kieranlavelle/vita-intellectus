@@ -59,10 +59,15 @@ export default {
             this.dialog.value = false;
         },
         create: function(){
-            let innterThis = this;
-            API.post("/habbits", {name: this.habbitName, days: this.selectedDays})
+            let config = {
+                headers: {
+                    Authorization: `Bearer ${this.$store.getters.token}`
+                }
+            }
+
+            API.post("/habbits", {name: this.habbitName, days: this.selectedDays}, config)
                .then(response => {
-                   innterThis.$emit("newHabbit");
+                   this.$emit("add");
                })
             
             this.habbitName = "";

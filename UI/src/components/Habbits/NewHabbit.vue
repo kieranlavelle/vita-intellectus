@@ -24,11 +24,11 @@
                         Create New Habbit
                     </v-toolbar>
                     <v-card-text>
-                        <new-habbit-form :dialog="dialog" />
+                        <new-habbit-form
+                            :dialog="dialog" 
+                            @add="$emit('add')"
+                        />
                     </v-card-text>
-                    <!-- <v-card-actions class="justify-end">
-
-                    </v-card-actions> -->
                 </v-card>
             </template>
         </v-dialog>

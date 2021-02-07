@@ -1,15 +1,16 @@
 <template>
     <v-container fluid class="habbits-view">
-        <v-row
-            @newhabbit="reloadHabits"
-        >
-            <new-habbit />
+        <v-row>
+            <new-habbit 
+                @add="reloadHabits"
+            />
         </v-row>
         <v-row>
             <habbit
                 v-for="habbit in habbits"
                 :key="habbit.habbit_id"
                 v-bind="habbit"
+                @delete="deleteHabbit(habbit.habbit_id)"
                 class="habbit"
                 :class="{mobile: isMobile, tablet: isTablet, computer: isComputer}"
             />
@@ -34,14 +35,13 @@ export default {
         errorGettingHabbits: false,
     }),
     methods: {
-        hasHabbits: function() {
-            console.log(this.habbits);
-            return this.habbits.length > 0;
-        },
         reloadHabits: function() {
             API.get("habbits", this.config)
             .then(response => (this.habbits = response.data))
             .catch(error => (this.errorGettingHabbits = true))
+        },
+        deleteHabbit: function(habbit_id) {
+            this.habbits = this.habbits.filter(h => h.habbit_id != habbit_id)
         }
     },
     beforeMount: async function(){

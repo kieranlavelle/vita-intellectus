@@ -12,7 +12,7 @@
           color="primary"
           size="40"
         >
-          {{initial}}
+          {{this.$store.getters.username.charAt(0)}}
         </v-avatar>
 
         <v-btn
