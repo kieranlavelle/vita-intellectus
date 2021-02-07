@@ -40,8 +40,11 @@
 </template>
 
 <script>
+import { AUTH } from '../endpoints/http-config'
+
+
   export default {
-    name: 'SignUpComponent',
+    name: 'LoginComponent',
     data() {
         return {
             accountCreated: false,
@@ -59,37 +62,27 @@
             formData.append('username', this.username);
             formData.append('password', this.password);
 
-            let vm = this;
+            AUTH.post("/login", formData)
+                .then(response => {
+                    this.message = "Logged In";
 
-            this.axios.post("https://node404.com/auth/login", formData)
-                      .then((res) => {
-                          console.log(res);
-                          if (res.status == 200) {
-                              vm.message = "Logged In."
-                              vm.accountCreated = true;
+                    console.log("Loggin In")
+                    console.log(response)
+                    this.$store.commit('setToken', response.data.access_token);
+                    this.$store.commit('setUser', response.data.username);
 
+                    console.log(`Store Value: ${this.$store.getters.token}`)
 
-                              //set the token
-                              window.localStorage.setItem('token', res.data.access_token);
-                              window.localStorage.setItem('username', res.data.username);
-                              vm.$router.push('home');
-                          } else {
-                              vm.message = "Invalid Credentials."
-                              vm.accountCreated = false;
-                              vm.accountCreatedError = true;
-                          }
-                      })
-                      .catch((error) => {
-                            vm.message = "Invalid Credentials."
-                            vm.accountCreated = false;
-                            vm.accountCreatedError = true;
-                          console.log(error);
-                      })
+                    this.$router.push('habbits');
+                })
+                .catch((error) => {
+                    this.message = "Invalid Credentials."
+                    console.log(error);
+                })
         }
     },
     computed: {
       cols () {
-        console.log(this.$vuetify.breakpoint.name)
         switch (this.$vuetify.breakpoint.name) {
             case 'xs': return "10"
             case 'sm': return "6"

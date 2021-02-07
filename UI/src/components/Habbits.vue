@@ -10,9 +10,8 @@
                 v-for="habbit in habbits"
                 :key="habbit.habbit_id"
                 v-bind="habbit"
-                
                 class="habbit"
-                :class="{isMobile: mobile, isTablet: tablet, isComputer: computer}"
+                :class="{mobile: isMobile, tablet: isTablet, computer: isComputer}"
             />
         </v-row>
     </v-container>
@@ -36,16 +35,25 @@ export default {
     }),
     methods: {
         hasHabbits: function() {
+            console.log(this.habbits);
             return this.habbits.length > 0;
         },
         reloadHabits: function() {
-            API.get("habbits")
+            API.get("habbits", this.config)
             .then(response => (this.habbits = response.data))
             .catch(error => (this.errorGettingHabbits = true))
         }
     },
-    mounted: async function(){
-        API.get("habbits")
+    beforeMount: async function(){
+        console.log("Calling before mount")
+
+        this.config = {
+            headers: {
+                Authorization: `Bearer ${this.$store.getters.token}`
+            }
+        }
+
+        API.get("habbits", this.config)
            .then(response => (this.habbits = response.data))
            .catch(error => (this.errorGettingHabbits = true))
     },

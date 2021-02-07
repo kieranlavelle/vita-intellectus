@@ -4,7 +4,7 @@
       app
       color="white"
       flat
-      v-if="loggedIn()"
+      v-if="loggedIn"
     >
       <v-container class="py-0 fill-height fluid">
         <v-avatar
@@ -41,37 +41,69 @@
 
 <script>
 
+import { AUTH } from "./endpoints/http-config"
 import Menu from './components/Menu'
 
 export default {
-  name: 'App',
-
-  components: {
-    Menu
-  },
-
-  data: () => ({
-    links: [
-      "Habbits"
-    ],
-    initial: "",
-  }),
-  methods: {
-    loggedIn: function() {
-      var loggedIn = window.localStorage.getItem('token') != "null"
-      if (!loggedIn) {
-        this.$router.push('login');
-      }
-      return loggedIn;
+    name: 'App',
+    components: {
+        Menu
     },
-    navigate: function(destination) {
-      this.$router.push(destination.toLowerCase());
+    data: () => ({
+        loggedIn: false,
+        links: [
+            "Habbits"
+        ],
+        initial: "",
+    }),
+    methods: {
+        navigate: function(destination) {
+            this.$router.push(destination.toLowerCase());
+        },
+        checkToken: function() {
+
+            if (this.$store.getters.token == "") {
+                this.loggedIn = false;
+                if (this.$route.name != 'login'){
+                    this.$router.push('login');
+                }
+                return
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${this.$store.getters.token}`
+                }
+            }
+
+            AUTH.put("/refresh", {}, config)
+                .then(response => {
+                    if (response.status == 200) {
+                        this.loggedIn = true;
+                        this.$store.commit('setToken', response.headers.token)
+                    }
+                })
+                .catch(response => {
+                    this.loggedIn = false;
+                    this.$store.commit('setToken', null);
+                    this.$store.commit('setUser', null);
+
+                    if (this.$route.name != 'login'){
+                        this.$router.push('login');
+                    }
+                })
+        }
+    },
+    created: function(){
+        let username = window.localStorage.getItem("username");
+        this.initial = username.charAt(0).toUpperCase();
+    },
+    beforeMount: function() {
+        this.checkToken();
+        window.setInterval(() => {
+            this.checkToken();
+        }, 1000*10*1)
     }
-  },
-  created: function(){
-    let username = window.localStorage.getItem("username");
-    this.initial = username.charAt(0).toUpperCase();
-  }
 };
 </script>
 

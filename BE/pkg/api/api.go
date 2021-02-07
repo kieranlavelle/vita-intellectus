@@ -64,14 +64,6 @@ func CreateRoutes() {
 	defer connection.Close(context.Background())
 
 	router := gin.Default()
-	// router.Use(cors.Default())
-
-	// router.Use(cors.New(cors.Config{
-	// 	AllowOrigins: []string{"*"},
-	// 	AllowMethods: []string{"*"},
-	// 	AllowHeaders: []string{"*"},
-	// }))
-
 	router.Use(AddDatabaseConnection(connection))
 	router.Use(AddUser(connection))
 
