@@ -64,7 +64,7 @@ export default {
 
             if (this.$store.getters.token == null) {
                 this.$store.commit('logout');
-                if (this.$route.name != 'login'){
+                if (this.$route.name != 'login' && this.$route.name != 'register'){
                     this.$router.push('login');
                 }
                 return
@@ -89,7 +89,7 @@ export default {
                     this.$store.commit('setToken', null);
                     this.$store.commit('setUser', null);
 
-                    if (this.$route.name != 'login'){
+                    if (this.$route.name != 'login' && this.$route.name != 'register'){
                         this.$router.push('login');
                     }
                 })
