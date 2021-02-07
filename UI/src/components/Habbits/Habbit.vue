@@ -79,9 +79,16 @@ export default {
     },
     methods: {
         complete: function(){
+
+            this.config = {
+                headers: {
+                    Authorization: `Bearer ${this.$store.getters.token}`
+                }
+            }
+
             if (!this.completed) {
                 let innerThis = this;
-                API.put("/habbits/complete", {"habbit_id": this.habbit_id})
+                API.put("/habbits/complete", {"habbit_id": this.habbit_id}, this.config)
                 .then(response => innerThis.completed = true)
             }
         },

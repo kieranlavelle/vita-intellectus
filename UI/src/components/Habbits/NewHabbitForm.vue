@@ -59,13 +59,13 @@ export default {
             this.dialog.value = false;
         },
         create: function(){
-            let config = {
+            this.config = {
                 headers: {
                     Authorization: `Bearer ${this.$store.getters.token}`
                 }
             }
 
-            API.post("/habbits", {name: this.habbitName, days: this.selectedDays}, config)
+            API.post("/habbits", {name: this.habbitName, days: this.selectedDays}, this.config)
                .then(response => {
                    this.$emit("add");
                })
