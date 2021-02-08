@@ -8,13 +8,22 @@ import (
 )
 
 // HabbitsByUser returns habbit_id,user_id,name
-func HabbitsByUser(conn *pgx.Conn, userID int) pgx.Rows {
-	rows, _ := conn.Query(
-		context.Background(),
-		"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1",
-		userID,
-	)
-	return rows
+func HabbitsByUser(conn *pgx.Conn, userID int, filter bool) pgx.Rows {
+	if filter {
+		rows, _ := conn.Query(
+			context.Background(),
+			"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1 AND last_completed::date = now()::date;",
+			userID,
+		)
+		return rows
+	} else {
+		rows, _ := conn.Query(
+			context.Background(),
+			"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1",
+			userID,
+		)
+		return rows
+	}
 }
 
 // CompletedHabbitsToday returns the number of completed habbits against a habbit today

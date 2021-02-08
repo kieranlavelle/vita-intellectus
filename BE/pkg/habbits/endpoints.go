@@ -13,20 +13,6 @@ import (
 	"github.com/kieranlavelle/vita-intellectus/pkg/persistence"
 )
 
-// Habbit represents a habbit a user wants to set
-type Habbit struct {
-	HabbitID       int      `json:"habbit_id"`
-	UserID         int      `json:"user_id"`
-	Name           string   `json:"name"`
-	Days           []string `json:"days"`
-	CompletedToday bool     `json:"completed_today"`
-}
-
-// CompleteHabbitBody represents the body expected by the completeHabbit request
-type CompleteHabbitBody struct {
-	HabbitID int `json:"habbit_id"`
-}
-
 // AddHabbit creates a new habbit for the user in the database
 func AddHabbit(c *gin.Context) {
 
@@ -61,6 +47,9 @@ func AddHabbit(c *gin.Context) {
 // GetHabbits get's every habbit for a user
 func GetHabbits(c *gin.Context) {
 
+	habbitsFilter, _ := c.GetQuery("filter")
+	filter := habbitsFilter == "due"
+
 	var habbit Habbit
 	var habbits []Habbit
 	var lastCompleted sql.NullTime
@@ -68,7 +57,7 @@ func GetHabbits(c *gin.Context) {
 	if conn, err := helpers.DatabaseConnection(c); err == nil {
 		if user, err := helpers.RequestUser(c); err == nil {
 
-			rows := persistence.HabbitsByUser(conn, user.UserID)
+			rows := persistence.HabbitsByUser(conn, user.UserID, filter)
 			for rows.Next() {
 				err := rows.Scan(
 					&habbit.HabbitID,
