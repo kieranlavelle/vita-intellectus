@@ -91,6 +91,8 @@
                           if (res.status == 200) {
                               vm.message = "Account Created."
                               vm.accountCreated = true;
+
+                              this.$router.push("login")
                           } else {
                               vm.message = "Failed to create account."
                               vm.accountCreated = false;

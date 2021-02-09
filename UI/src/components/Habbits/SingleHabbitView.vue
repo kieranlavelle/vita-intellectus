@@ -72,13 +72,13 @@ export default {
         editSaveText: "Edit",
         selectedDays: [],
         allDays: [
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-            "sunday"
+            {text: "Monday", value: "monday"},
+            {text: "Tuesday", value: "tuesday"},
+            {text: "Wednesday", value: "wednesday"},
+            {text: "Thursday", value: "thursday"},
+            {text: "Friday", value: "friday"},
+            {text: "Saturday", value: "saturday"},
+            {text: "Sunday", value: "sunday"}
         ]
     }),
     methods: {
