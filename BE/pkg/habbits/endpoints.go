@@ -85,6 +85,7 @@ func GetHabbits(c *gin.Context) {
 				}
 
 				// add the habbit into a slice
+				habbit = habbit.setDueDates()
 				habbits = append(habbits, habbit)
 			}
 		}
