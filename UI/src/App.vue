@@ -10,9 +10,12 @@
         <v-avatar
           class="mr-10"
           color="primary"
+          style="color: white;"
           size="40"
         >
-          {{this.$store.getters.username.charAt(0)}}
+          <b>
+            {{this.$store.getters.username.charAt(0).toUpperCase()}}
+          </b>
         </v-avatar>
 
         <v-btn
