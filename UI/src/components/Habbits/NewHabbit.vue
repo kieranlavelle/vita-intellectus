@@ -1,10 +1,15 @@
 <template>
-    <v-container fluid class="habbit-menu">
+    <v-container
+        fluid
+        class="habbit-menu"
+    >
         <v-dialog
             transition="dialog-bottom-transition"
             max-width="600"
         >
-            <template v-slot:activator="{ on, attrs }">
+            <template
+                v-slot:activator="{ on, attrs }"
+            >
                 <v-btn
                     v-bind="attrs"
                     v-on="on"

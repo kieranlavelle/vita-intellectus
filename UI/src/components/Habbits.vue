@@ -1,18 +1,29 @@
 <template>
     <v-container fluid class="habbits-view">
         <v-row>
-            <new-habbit 
+            <new-habbit
+                class="text-right"
                 @add="reloadHabits"
             />
         </v-row>
-        <v-row>
+        <v-row
+            :class="{
+                'justify-center': isMobile,
+                'justify-space-between': isTablet,
+                'justify-space-between': isComputer
+            }"
+        >
             <habbit
                 v-for="habbit in habbits"
                 :key="habbit.habbit_id"
                 v-bind="habbit"
                 @delete="deleteHabbit(habbit.habbit_id)"
                 class="habbit"
-                :class="{mobile: isMobile, tablet: isTablet, computer: isComputer}"
+                :class="{
+                    mobile: isMobile,
+                    tablet: isTablet,
+                    computer: isComputer
+                }"
             />
         </v-row>
     </v-container>
@@ -79,7 +90,7 @@ export default {
 
 .habbits-view {
     background-color: rgb(216, 216, 216);
-    padding: 25px 25px 50px 50px;
+    padding: 25px 50px 25px 50px;
 }
 
 .habbit {
