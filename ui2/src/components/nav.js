@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 
 import useStickyState from '../state/store'
@@ -16,39 +16,39 @@ const useStyles = makeStyles((theme) => ({
     menuButton: {
       marginRight: theme.spacing(2),
     },
-    title: {
-      flexGrow: 1,
-    },
     appBar: {
       'background-color': 'white',
       'color': 'black'
+    },
+    button: {
+      fontWeight: 'bold'
+    },
+    contentContainer: {
+      height: '100%'
     }
+
   }));
 
   export default function Navigation(props) {
     const classes = useStyles();
 
     const history = useHistory()
-    const redirect = useCallback(() => history.push('/login'), [history]);
+    const redirect = useCallback((path) => history.push(path), [history]);
     const [token, setToken] = useStickyState('token', '');
 
     const logout = () => {
       setToken('');
-      redirect()
+      redirect('/login')
     }
 
     return (
-      <div>
+      <div className={classes.contentContainer}>
         <AppBar position="static" className={classes.appBar}>
-            <Toolbar>
-                <Typography variant="h6" className={classes.title}>
-                    Habbits
-                </Typography>
-                <Button
-                  onClick={logout}
-                >
-                  Logout
-                </Button>
+            <Toolbar className={classes.toolbar}>
+                <Button className={classes.button}>Habbits</Button>
+                <Box textAlign="right" width='100%' fontWeight='bold'>
+                  <Button onClick={logout} className={classes.button}>logout</Button>
+                </Box>
             </Toolbar>
         </AppBar>
         {props.children}
@@ -56,13 +56,3 @@ const useStyles = makeStyles((theme) => ({
     )
 
 }
-
-// export default function Navigation(props){
-
-//     console.log(`LoggedIn2: ${props.loggedin}`)
-
-//     if (props.loggedin == true){
-//         return <LoggedInNavigation/>
-//     }
-//     return <Redirect to="/login"/>
-// }

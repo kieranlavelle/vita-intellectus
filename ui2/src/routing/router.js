@@ -1,4 +1,6 @@
 import React from "react"
+import { makeStyles } from '@material-ui/core/styles';
+
 import {
     BrowserRouter,
     Switch,
@@ -12,13 +14,33 @@ import Navigation from '../components/nav'
 
 import useStickyState from '../state/store'
 
-function GuardedRoute(props) {
+const useStyles = makeStyles((theme) => ({
+    root: {
+      flexGrow: 1,
+    },
+    menuButton: {
+      marginRight: theme.spacing(2),
+    },
+    appBar: {
+      'background-color': 'white',
+      'color': 'black'
+    },
+    button: {
+      fontWeight: 'bold'
+    },
+    contentContainer: {
+      height: '100%'
+    }
 
+}));
+
+function GuardedRoute(props) {
+    const classes = useStyles();
     const [token, setToken] = useStickyState("token", '');
-    console.log(token)
+
     if (token != "") {
         return (
-            <div>{props.children}</div>
+            props.children
         )
     } else {
         return <Redirect to={{ pathname: '/login' }} />

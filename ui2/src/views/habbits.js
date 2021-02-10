@@ -12,6 +12,7 @@ import useStickyState from '../state/store'
 const useStyles = makeStyles((theme) => ({
     container: {
       height: '100%',
+      backgroundColor: 'rgb(216, 216, 216);'
     },
     loginCard: {
         color: "white",
