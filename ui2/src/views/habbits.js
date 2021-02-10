@@ -59,7 +59,13 @@ export default function Habbits() {
                 justify="space-evenly"
                 className={classes.habbitContainer}
             > */}
-            <Box display="flex" flexWrap="wrap" justifyContent="center">
+            <Box
+                display="flex"
+                flexWrap="wrap"
+                justifyContent="space-around" 
+                flexDirection="row"
+                className={classes.habbitContainer}
+            >
                 {habbits.map((habbit) => (
                     <Habbit
                         className={classes.habbit}
