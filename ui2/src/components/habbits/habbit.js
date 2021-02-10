@@ -1,31 +1,30 @@
 import { useState } from 'react'
 
-import { Box, Card, CardActions, CardContent, Icon, Typography } from "@material-ui/core";
-import { green } from '@material-ui/core/colors';
-import DoneRounded from '@material-ui/icons/DoneRounded';
+import { Box, Card, CardActions, CardContent, Typography } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
+
+import CompleteHabbit from './completeHabbit'
 
 const useStyles = makeStyles((theme) => ({
     habbitCard: {
-        width: "30%"
+        // width: '30%',
+        margin: '10px',
+        [theme.breakpoints.down('sm')]: {
+            width: '90%',
+        },
+        [theme.breakpoints.up('md')]: {
+            width: '40%'
+        },
+        [theme.breakpoints.up('lg')]: {
+            width: '30%',
+        }
     },
-    completeHabbit: {
-        width: '100%'
-    },
-    checkButton: {
-        transform: 'scale(1.2)'
-    },
-    colorCheckButton: {
-        color: green[500],
-        transform: 'scale(1.3)'
-    }
+
   }));
 
 export default function Habbit(props){
     const classes = useStyles();
     const [elevation, setElevation] = useState(5);
-    const [hover, setHover] = useState(false);
-    const toggleHover = () => setHover(!hover);
 
     const nextDue = props.completedToday ?
                         props.dueDates.next_due_on_completed
@@ -46,15 +45,8 @@ export default function Habbit(props){
                 </CardContent>
             </Box>
             <CardActions>
-                <Box textAlign="right" width='100%' className={classes.completeHabbit}>
-                    <DoneRounded
-                        className={hover ? classes.colorCheckButton : classes.checkButton}
-                        onMouseEnter={toggleHover}
-                        onMouseLeave={toggleHover}
-                    />
-                </Box>
+                <CompleteHabbit />
             </CardActions>
         </Card>
     )
-    return <h1>{props.name}</h1>
 }

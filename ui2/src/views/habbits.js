@@ -53,12 +53,13 @@ export default function Habbits() {
             <Box textAlign="right" width='100%' className={classes.subMenu}>
                 <NewHabbit />
             </Box>
-            <Grid
+            {/* <Grid
                 container
                 direction="row"
                 justify="space-evenly"
                 className={classes.habbitContainer}
-            >
+            > */}
+            <Box display="flex" flexWrap="wrap" justifyContent="center">
                 {habbits.map((habbit) => (
                     <Habbit
                         className={classes.habbit}
@@ -68,7 +69,8 @@ export default function Habbits() {
                         completedToday={habbit.completed_today}
                     />
                 ))}
-            </Grid>
+            </Box>
+            {/* </Grid> */}
         </Box>
     )
 }
