@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom'
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -36,10 +36,11 @@ const useStyles = makeStyles((theme) => ({
     const redirect = useCallback((path) => history.push(path), [history]);
     const [token, setToken] = useStickyState('token', '');
 
-    const logout = () => {
-      setToken('');
-      redirect('/login')
-    }
+    useEffect(() => {
+      if (token == '') {
+        redirect('/login');
+      }
+    }, [token, redirect]);
 
     return (
       <div className={classes.contentContainer}>
@@ -47,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
             <Toolbar className={classes.toolbar}>
                 <Button className={classes.button}>Habbits</Button>
                 <Box textAlign="right" width='100%' fontWeight='bold'>
-                  <Button onClick={logout} className={classes.button}>logout</Button>
+                  <Button onClick={() => setToken('')} className={classes.button}>logout</Button>
                 </Box>
             </Toolbar>
         </AppBar>

@@ -8,6 +8,7 @@ import {
     Redirect
 } from 'react-router-dom';
 
+import Register from '../views/register'
 import Login from '../views/login'
 import Habbits from '../views/habbits'
 import Navigation from '../components/nav'
@@ -52,9 +53,8 @@ export default function Router(){
     return (
         <BrowserRouter>
             <Switch>
-                <Route exact path="/login">
-                    <Login />
-                </Route>
+                <Route exact path="/login" component={Login} />
+                <Route exact path="/register" component={Register} />
                 <GuardedRoute exact path="/habbits">
                     <Navigation>
                         <Habbits />
