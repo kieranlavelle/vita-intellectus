@@ -64,6 +64,8 @@ export default function Habbits() {
                         className={classes.habbit}
                         key={habbit.habbit_id}
                         name={habbit.name}
+                        dueDates={habbit.due_dates}
+                        completedToday={habbit.completed_today}
                     />
                 ))}
             </Grid>
