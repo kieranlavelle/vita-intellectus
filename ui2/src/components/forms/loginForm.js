@@ -1,8 +1,7 @@
-import React, { useCallback, useState  } from 'react'
+import React, { useCallback } from 'react'
 import {useHistory} from 'react-router-dom';
 
 import TextField from '@material-ui/core/TextField'
-import Input from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Box from '@material-ui/core/Box'
 
@@ -10,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from "react-hook-form";
 
 import { AUTH } from '../../http'
+import useStickyState from '../../state/store'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,6 +33,8 @@ export default function LoginForm(){
     const {register, handleSubmit, errors} = useForm();
     const classes = useStyles();
 
+    const [token, setToken] = useStickyState('token', '');
+
     const history = useHistory()
     const onLogin = useCallback(() => history.push('/habbits'), [history]);
 
@@ -43,11 +45,10 @@ export default function LoginForm(){
 
         AUTH.post("/login", formData)
             .then(response => {
-                console.log("logged IN");
+                const tokenData = response.data.access_token;
 
-                // set the global login state
-
-                // navigate to habbits
+                setToken(tokenData);
+                console.log("moving to habbits")
                 onLogin()
             })
             .catch(error => console.log(error))

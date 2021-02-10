@@ -1,9 +1,12 @@
-import React, { Component } from 'react';
+import React, { useCallback } from 'react';
+import { useHistory } from 'react-router-dom'
 
 import TextField from '@material-ui/core/TextField'
 import Card from '@material-ui/core/Card'
 import Grid from '@material-ui/core/Grid'
 import { makeStyles } from '@material-ui/core/styles';
+
+import useStickyState from '../state/store'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Habbits() {
     const classes = useStyles()
+    const [token, setToken] = useStickyState('token', '');
 
     return (
             <Grid
@@ -36,6 +40,7 @@ export default function Habbits() {
                 className={classes.container}
             >
                 <h1>Habbits</h1>
+                <p>Token: {token}</p>
             </Grid>
     )
 }
