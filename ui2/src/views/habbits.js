@@ -1,47 +1,72 @@
-import React, { useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom'
 
-import TextField from '@material-ui/core/TextField'
-import Card from '@material-ui/core/Card'
 import Grid from '@material-ui/core/Grid'
+import Box from '@material-ui/core/Box'
 import { makeStyles } from '@material-ui/core/styles';
 
+import NewHabbit from '../components/habbits/newHabbit'
+import Habbit from '../components/habbits/habbit'
+
 import useStickyState from '../state/store'
+import { API } from '../http'
 
 
 const useStyles = makeStyles((theme) => ({
     container: {
       height: '100%',
-      backgroundColor: 'rgb(216, 216, 216);'
+      backgroundColor: 'rgb(216, 216, 216);',
+      padding: '10px 25px 10px 25px'
     },
-    loginCard: {
-        color: "white",
-        opacity: 0.9,
-        [theme.breakpoints.down('sm')]: {
-            width: '90%',
-        },
-        [theme.breakpoints.up('md')]: {
-            width: '50%'
-        },
-        [theme.breakpoints.up('lg')]: {
-            width: '30%',
-        },
+    subMenu: {
+        width: '100%',
+        paddingBottom: '10px'
+    },
+    habbitContainer: {
+        width: '100%'
+    },
+    habbit: {
+        width: '30%'
     }
   }));
 
 export default function Habbits() {
     const classes = useStyles()
     const [token, setToken] = useStickyState('token', '');
+    const [habbits, setHabbits] = useState([]);
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+
+    useEffect(() => {
+        API.get("/habbits", config).then(response => {
+            setHabbits(response.data);
+            console.log(response.data)
+        })
+      }, []);
 
     return (
+        <Box className={classes.container}>
+            <Box textAlign="right" width='100%' className={classes.subMenu}>
+                <NewHabbit />
+            </Box>
             <Grid
                 container
-                justify="center"
-                alignContent="center"
-                className={classes.container}
+                direction="row"
+                justify="space-evenly"
+                className={classes.habbitContainer}
             >
-                <h1>Habbits</h1>
-                <p>Token: {token}</p>
+                {habbits.map((habbit) => (
+                    <Habbit
+                        className={classes.habbit}
+                        key={habbit.habbit_id}
+                        name={habbit.name}
+                    />
+                ))}
             </Grid>
+        </Box>
     )
 }
