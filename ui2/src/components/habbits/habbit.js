@@ -7,13 +7,12 @@ import CompleteHabbit from './completeHabbit'
 
 const useStyles = makeStyles((theme) => ({
     habbitCard: {
-        // width: '30%',
         margin: '10px',
         [theme.breakpoints.down('sm')]: {
-            width: '90%',
+            width: '100%',
         },
         [theme.breakpoints.up('md')]: {
-            width: '40%'
+            width: '47%'
         },
         [theme.breakpoints.up('lg')]: {
             width: '30%',

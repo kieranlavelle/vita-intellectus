@@ -48,7 +48,6 @@ export default function LoginForm(){
                 const tokenData = response.data.access_token;
 
                 setToken(tokenData);
-                console.log("moving to habbits")
                 onLogin()
             })
             .catch(error => console.log(error))

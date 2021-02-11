@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     container: {
       height: '100%',
       backgroundColor: 'rgb(216, 216, 216);',
-      padding: '10px 25px 10px 25px'
+      padding: '10px 25px 10px 25px',
     },
     subMenu: {
         width: '100%',
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%'
     },
     habbit: {
-        width: '30%'
+        // minWidth: '30%'
     }
   }));
 
@@ -53,17 +53,15 @@ export default function Habbits() {
             <Box textAlign="right" width='100%' className={classes.subMenu}>
                 <NewHabbit />
             </Box>
-            {/* <Grid
-                container
-                direction="row"
-                justify="space-evenly"
-                className={classes.habbitContainer}
-            > */}
             <Box
                 display="flex"
-                flexWrap="wrap"
-                justifyContent="space-around" 
                 flexDirection="row"
+                flexWrap="wrap"
+                justifyContent="space-between" 
+                // display="flex"
+                // flexWrap="wrap"
+                // justifyContent="space-between" 
+                // flexDirection="row"
                 className={classes.habbitContainer}
             >
                 {habbits.map((habbit) => (
@@ -76,7 +74,6 @@ export default function Habbits() {
                     />
                 ))}
             </Box>
-            {/* </Grid> */}
         </Box>
     )
 }
