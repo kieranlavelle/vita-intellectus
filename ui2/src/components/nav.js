@@ -42,6 +42,14 @@ const useStyles = makeStyles((theme) => ({
       }
     }, [token, redirect]);
 
+    const childrenWithProps = React.Children.map(props.children, child => {
+      // checking isValidElement is the safe way and avoids a typescript error too
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, { id:  props.id});
+      }
+      return child;
+    });
+
     return (
       <div className={classes.contentContainer}>
         <AppBar position="static" className={classes.appBar}>
@@ -52,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
                 </Box>
             </Toolbar>
         </AppBar>
-        {props.children}
+        {childrenWithProps}
       </div>
     )
 

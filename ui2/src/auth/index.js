@@ -1,8 +1,8 @@
 import { AUTH } from '../http'
-import usePersistedState from 'use-persisted-state-hook'
+import useStickyState from '../state/store'
 
-function Session(){
-    const [token, setToken] = usePersistedState('token', '');
+function GetAuthHeaders() {
+    const [token, setToken] = useStickyState('token', '');
 
     const config = {
         headers: {
@@ -10,25 +10,37 @@ function Session(){
         }
     }
 
-    let loggedIn = false;
+    return config
+}
 
-    AUTH.put('/refresh', {}, config)
-        .then(response => {
-            // setToken(response.headers.token)
-            console.log("logged in")
-            loggedIn = true;
-        })
-        .catch(error => {
-            loggedIn = false;
-            console.log(error);
-        })
+// function Session(){
+//     const [token, setToken] = usePersistedState('token', '');
+
+//     const config = {
+//         headers: {
+//             Authorization: `Bearer ${token}`
+//         }
+//     }
+
+//     let loggedIn = false;
+
+//     AUTH.put('/refresh', {}, config)
+//         .then(response => {
+//             // setToken(response.headers.token)
+//             console.log("logged in")
+//             loggedIn = true;
+//         })
+//         .catch(error => {
+//             loggedIn = false;
+//             console.log(error);
+//         })
     
-    return loggedIn
-}
+//     return loggedIn
+// }
 
-function CheckToken(){
-    const [token, setToken] = usePersistedState('token', '');
-    return token != '';
-}
+// function CheckToken(){
+//     const [token, setToken] = usePersistedState('token', '');
+//     return token != '';
+// }
 
-export {Session, CheckToken}
+export {GetAuthHeaders}

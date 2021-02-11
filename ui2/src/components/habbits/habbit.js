@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+
+import { useHistory } from 'react-router-dom'
 
 import { Box, Card, CardActions, CardContent, Typography } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,7 +9,7 @@ import CompleteHabbit from './completeHabbit'
 
 const useStyles = makeStyles((theme) => ({
     habbitCard: {
-        margin: '10px',
+        margin: '1%',
         [theme.breakpoints.down('sm')]: {
             width: '100%',
         },
@@ -15,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
             width: '47%'
         },
         [theme.breakpoints.up('lg')]: {
-            width: '30%',
+            width: '31%',
         }
     },
 
@@ -24,10 +26,17 @@ const useStyles = makeStyles((theme) => ({
 export default function Habbit(props){
     const classes = useStyles();
     const [elevation, setElevation] = useState(5);
+    const [showDialog, setShowDialog] = useState(false);
 
-    const nextDue = props.completedToday ?
-                        props.dueDates.next_due_on_completed
-                        : props.dueDates.next_due
+    const [nextDue, setNextDue] = useState(props.completedToday ?
+        props.dueDates.next_due_on_completed
+        : props.dueDates.next_due);
+
+    const history = useHistory()
+    const redirect = useCallback((path) => history.push(path), [history]);
+
+    const changeNextDue = () => setNextDue(props.dueDates.next_due_on_completed);
+
 
     return (
         <Card
@@ -36,6 +45,7 @@ export default function Habbit(props){
             className={classes.habbitCard}
             onMouseEnter={() => setElevation(10)}
             onMouseLeave={() => setElevation(5)}
+            onClick={() => redirect(`/habbit/${props.habbitID}`)}
         >
             <Box textAlign="left" fontFamily="verdana" fontWeight="fontWeightLight">
                 <CardContent>
@@ -44,7 +54,12 @@ export default function Habbit(props){
                 </CardContent>
             </Box>
             <CardActions>
-                <CompleteHabbit />
+                <CompleteHabbit
+                    habbitID={props.habbitID}
+                    completed={props.completedToday}
+                    dueDates={props.dueDates}
+                    onCompleteChange={() => changeNextDue()}
+                />
             </CardActions>
         </Card>
     )

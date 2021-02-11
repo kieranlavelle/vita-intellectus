@@ -44,7 +44,6 @@ export default function Habbits() {
     useEffect(() => {
         API.get("/habbits", config).then(response => {
             setHabbits(response.data);
-            console.log(response.data)
         })
       }, []);
 
@@ -57,11 +56,7 @@ export default function Habbits() {
                 display="flex"
                 flexDirection="row"
                 flexWrap="wrap"
-                justifyContent="space-between" 
-                // display="flex"
-                // flexWrap="wrap"
-                // justifyContent="space-between" 
-                // flexDirection="row"
+                justifyContent="flex-start"
                 className={classes.habbitContainer}
             >
                 {habbits.map((habbit) => (
@@ -71,6 +66,7 @@ export default function Habbits() {
                         name={habbit.name}
                         dueDates={habbit.due_dates}
                         completedToday={habbit.completed_today}
+                        habbitID={habbit.habbit_id}
                     />
                 ))}
             </Box>

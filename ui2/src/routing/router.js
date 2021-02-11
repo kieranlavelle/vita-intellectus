@@ -11,6 +11,7 @@ import {
 import Register from '../views/register'
 import Login from '../views/login'
 import Habbits from '../views/habbits'
+import Habbit from '../views/habbit'
 import Navigation from '../components/nav'
 
 import useStickyState from '../state/store'
@@ -40,8 +41,17 @@ function GuardedRoute(props) {
     const [token, setToken] = useStickyState("token", '');
 
     if (token != "") {
+
+        const childrenWithProps = React.Children.map(props.children, child => {
+            // checking isValidElement is the safe way and avoids a typescript error too
+            if (React.isValidElement(child)) {
+              return React.cloneElement(child, { id:  props.computedMatch.params.id});
+            }
+            return child;
+          });
+
         return (
-            props.children
+            childrenWithProps
         )
     } else {
         return <Redirect to={{ pathname: '/login' }} />
@@ -58,6 +68,11 @@ export default function Router(){
                 <GuardedRoute exact path="/habbits">
                     <Navigation>
                         <Habbits />
+                    </Navigation>
+                </GuardedRoute>
+                <GuardedRoute exact path="/habbit/:id" children={Habbit}>
+                    <Navigation>
+                        <Habbit />
                     </Navigation>
                 </GuardedRoute>
             </Switch>
