@@ -35,6 +35,11 @@ export default function Habbits() {
     const [token, setToken] = useStickyState('token', '');
     const [habbits, setHabbits] = useState([]);
 
+    const addNewHabbit = (habbit) => {
+        console.log('called')
+        setHabbits([...habbits, habbit]);
+    }
+
     const config = {
         headers: {
             Authorization: `Bearer ${token}`
@@ -47,10 +52,12 @@ export default function Habbits() {
         })
       }, []);
 
+    
+
     return (
         <Box className={classes.container}>
             <Box textAlign="right" width='100%' className={classes.subMenu}>
-                <NewHabbit />
+                <NewHabbit onNewHabbit={addNewHabbit}/>
             </Box>
             <Box
                 display="flex"

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState, useEffect } from 'react'
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -8,18 +9,12 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button'
 import Add from '@material-ui/icons/Add';
 
+
 import { makeStyles } from '@material-ui/core/styles';
 
-
-const days = [
-    'monday',
-    'tusday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday'
-  ];
+import DayPicker from '../dayPicker'
+import { API } from '../../http'
+import { GetAuthHeaders } from '../../auth'
 
 const useStyles = makeStyles((theme) => ({
 
@@ -27,11 +22,15 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-export default function NewHabbit(){
+export default function NewHabbit(props){
 
-    const [open, setOpen] = React.useState(false);
-    const [selectedDays, setSelectedDays] = React.useState([]);
+    const [open, setOpen] = useState(false);
+    const [createHabbit, setCreateHabbit] = useState(false);
+    const [selectedDays, setSelectedDays] = useState();
+    const [habbitName, setHabbitName] = useState("");
+
     const classes = useStyles();
+    const config = GetAuthHeaders();
 
     const handleClickOpen = () => {
       setOpen(true);
@@ -41,9 +40,35 @@ export default function NewHabbit(){
       setOpen(false);
     };
 
-    const handleChange = (event) => {
-        setSelectedDays(event.target.value);
+    const updateDays = (days) => {
+        setSelectedDays(days);
     };
+
+    const setName = (name) => {
+        setHabbitName(name);
+    }
+
+    const toggleHabbit = () => setCreateHabbit(!createHabbit);
+
+    useEffect(() => {
+        if (!createHabbit){
+            return
+        }
+
+        API.post("/habbits", {
+            name: habbitName,
+            days: selectedDays
+        }, config)
+        .then(response => {
+            toggleHabbit()
+            props.onNewHabbit(response.data);
+            handleClose();
+        })
+        .catch(error => {
+            toggleHabbit()
+            handleClose();
+        })
+    }, [habbitName, selectedDays, config, createHabbit, toggleHabbit, props])
 
     return (
         <div>
@@ -65,13 +90,15 @@ export default function NewHabbit(){
                         label="Habbit Name"
                         type="text"
                         fullWidth
+                        onChange={event => setName(event.target.value)}
                     />
+                    <DayPicker updateDays={updateDays}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
-                    Cancel
+                        Cancel
                     </Button>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={toggleHabbit} color="primary">
                         Create
                     </Button>
                 </DialogActions>

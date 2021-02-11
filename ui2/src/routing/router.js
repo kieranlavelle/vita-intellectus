@@ -61,7 +61,7 @@ function GuardedRoute(props) {
 export default function Router(){
 
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={'/vita'}>
             <Switch>
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/register" component={Register} />
