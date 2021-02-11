@@ -24,9 +24,6 @@ const useStyles = makeStyles((theme) => ({
     },
     habbitContainer: {
         width: '100%'
-    },
-    habbit: {
-        // minWidth: '30%'
     }
   }));
 
@@ -36,7 +33,6 @@ export default function Habbits() {
     const [habbits, setHabbits] = useState([]);
 
     const addNewHabbit = (habbit) => {
-        console.log('called')
         setHabbits([...habbits, habbit]);
     }
 
@@ -48,7 +44,7 @@ export default function Habbits() {
 
     useEffect(() => {
         API.get("/habbits", config).then(response => {
-            setHabbits(response.data);
+            setHabbits(response.data ? response.data : []);
         })
       }, []);
 

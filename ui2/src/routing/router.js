@@ -60,9 +60,20 @@ function GuardedRoute(props) {
 
 export default function Router(){
 
+    const [token, setToken] = useStickyState("token", '');
+
     return (
         <BrowserRouter basename={'/vita'}>
             <Switch>
+                <Route
+                    exact
+                    path="/"
+                    render={() => {
+                        return (
+                            token != "" ? <Redirect to='/habbits'/> : <Redirect to='/login'/>
+                        )
+                    }}
+                />
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/register" component={Register} />
                 <GuardedRoute exact path="/habbits">
