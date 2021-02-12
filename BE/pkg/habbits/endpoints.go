@@ -45,7 +45,7 @@ func AddHabbit(c *gin.Context) {
 			}
 
 			habbit.UserID = user.UserID
-			habbit.setDueDates()
+			habbit = habbit.setDueDates()
 			c.JSON(http.StatusOK, habbit)
 			return
 		}
