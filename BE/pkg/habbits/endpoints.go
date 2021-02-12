@@ -54,7 +54,10 @@ func GetHabbits(c *gin.Context) {
 
 	var habbit Habbit
 	var lastCompleted sql.NullTime
-	habbits := []Habbit{}
+
+	completedHabbits := []Habbit{}
+	dueHabbits := []Habbit{}
+	notDueHabbits := []Habbit{}
 
 	conn, err := helpers.DatabaseConnection(c)
 	if err != nil {
@@ -73,7 +76,9 @@ func GetHabbits(c *gin.Context) {
 		switch err {
 		case pgx.ErrNoRows:
 			c.JSON(http.StatusOK, gin.H{
-				"habbits": habbits,
+				"due":       dueHabbits,
+				"completed": completedHabbits,
+				"not_due":   notDueHabbits,
 			})
 			return
 		default:
@@ -110,13 +115,32 @@ func GetHabbits(c *gin.Context) {
 			habbit.CompletedToday = false
 		}
 
-		// add the habbit into a slice
+		// set the due dates
 		habbit = habbit.setDueDates()
-		habbits = append(habbits, habbit)
+
+		if habbit.NextDue.NextDue == "Today" {
+			if habbit.CompletedToday {
+				completedHabbits = append(completedHabbits, habbit)
+			} else {
+				dueHabbits = append(dueHabbits, habbit)
+			}
+		} else {
+			notDueHabbits = append(notDueHabbits, habbit)
+		}
+
+		// if habbit.CompletedToday {
+		// 	completedHabbits = append(completedHabbits, habbit)
+		// }
+
+		// // add the habbit into a slice
+		// habbit = habbit.setDueDates()
+		// habbits = append(habbits, habbit)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"habbits": habbits,
+		"due":       dueHabbits,
+		"completed": completedHabbits,
+		"not_due":   notDueHabbits,
 	})
 }
 
