@@ -37,9 +37,9 @@ export default function DayPicker(props){
 
     const ToggleDay = async day => {
         if (days.includes(day)) {
-            await setDays(days.filter(iDay => iDay != day));
+            setDays(days.filter(iDay => iDay != day));
         } else {
-            await setDays([...days, day]);
+            setDays([...days, day]);
         }
     }
 
@@ -47,7 +47,7 @@ export default function DayPicker(props){
     useEffect(() => {props.updateDays(days)}, [props, days]);
 
     return (
-        <Box display="flex" width="100%">
+        <Box display="flex" flexWrap="wrap" width="100%">
             <Chip
                 variant={days.includes('monday') ? 'default' : 'outlined'}
                 className={classes.chip}
