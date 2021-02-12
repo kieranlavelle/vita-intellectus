@@ -146,25 +146,41 @@ func GetHabbits(c *gin.Context) {
 
 // CompleteHabbit add's a habbit_completion
 func CompleteHabbit(c *gin.Context) {
-	if conn, err := helpers.DatabaseConnection(c); err == nil {
-		completeHabbitBody := CompleteHabbitBody{}
-		c.BindJSON(&completeHabbitBody)
 
-		err := AddTrackedHabbit(conn, completeHabbitBody.HabbitID)
-		if err != nil {
-			c.AbortWithStatus(http.StatusInternalServerError)
-		}
-
-		err = UpdateLastCompleted(conn, completeHabbitBody.HabbitID)
-		if err != nil {
-			c.AbortWithStatus(http.StatusInternalServerError)
-		}
-
-		c.AbortWithStatus(http.StatusOK)
-		return
+	conn, err := helpers.DatabaseConnection(c)
+	if err != nil {
+		log.Printf("error connecting to database: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later",
+		})
 	}
 
-	c.AbortWithStatus(http.StatusInternalServerError)
+	completeHabbitBody := CompleteHabbitBody{}
+	err := c.BindJSON(&completeHabbitBody)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"detail": "invalid request body.",
+		})
+	}
+
+	err = AddTrackedHabbit(conn, completeHabbitBody.HabbitID)
+	if err != nil {
+		log.Printf("error adding tracked habbit to db: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later",
+		})
+	}
+
+	err = UpdateLastCompleted(conn, completeHabbitBody.HabbitID)
+	if err != nil {
+		log.Printf("error updating last completed: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later",
+		})
+	}
+
+	//TODO: Alter to have new Habbit returned
+	c.JSON(http.StatusOK, gin.H{"detail": "success"})
 }
 
 // DeleteHabbit removes the habbit specified
