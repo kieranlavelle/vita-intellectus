@@ -41,14 +41,12 @@ export default function CompleteHabbit(props){
 
     return (
         <Button>
-        {/* <Box textAlign="right" width='100%' className={classes.completeHabbit}> */}
             <DoneRounded
                 className={hovered || completed ? classes.colorCheckButton : classes.checkButton}
                 onMouseEnter={toggleHovered}
                 onMouseLeave={toggleHovered}
                 onClick={completeHabbit}
             />
-        {/* </Box> */}
         </Button>
     )
 }

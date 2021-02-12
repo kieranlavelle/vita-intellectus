@@ -60,7 +60,7 @@ export default function NewHabbit(props){
             days: selectedDays
         }, config)
         .then(response => {
-            toggleHabbit()
+            toggleHabbit();
             props.onNewHabbit(response.data);
             handleClose();
         })

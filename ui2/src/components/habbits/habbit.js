@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 
 import { useHistory } from 'react-router-dom'
 
-import { Box, Card, CardActions, CardContent, Typography } from "@material-ui/core";
+import { Box, Card, CardActionArea, CardActions, CardContent, Typography } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 
 import CompleteHabbit from './completeHabbit'
@@ -45,17 +45,16 @@ export default function Habbit(props){
             className={classes.habbitCard}
             onMouseEnter={() => setElevation(10)}
             onMouseLeave={() => setElevation(5)}
-            onClick={(e) => {
-                e.preventDefault();
-                redirect(`/habbit/${props.habbitID}`);
-            }}
         >
-            <Box textAlign="left" fontFamily="verdana" fontWeight="fontWeightLight">
-                <CardContent>
-                    <Typography variant="overline">{props.name}</Typography>
-                    <Typography variant="subtitle2">Next Due: {nextDue}</Typography>
-                </CardContent>
-            </Box>
+            <CardActionArea onClick={() => redirect(`/habbit/${props.habbitID}`)}>
+                <Box textAlign="left" fontFamily="verdana" fontWeight="fontWeightLight">
+                    <CardContent>
+                        <Typography variant="overline">{props.name}</Typography>
+                        <Typography variant="subtitle2">Next Due: {nextDue}</Typography>
+                    </CardContent>
+                </Box>
+            </CardActionArea>
+
             <Box display="flex" justifyContent="flex-end">
                 <CardActions>
                     <CompleteHabbit
