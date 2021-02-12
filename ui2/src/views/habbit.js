@@ -22,7 +22,14 @@ export default function Habbit(props){
 
     useEffect(() => {
         API.get("/habbits", config).then(response => {
-            setHabbit(response.data.filter(
+
+            const allHabbits = [
+                ...response.data.due,
+                ...response.data.completed,
+                ...response.data.not_due
+            ]
+
+            setHabbit(allHabbits.filter(
                 habbit => habbit.habbit_id == props.id
             )[0]);
         })
