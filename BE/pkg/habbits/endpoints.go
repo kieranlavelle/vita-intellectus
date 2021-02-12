@@ -27,6 +27,13 @@ func AddHabbit(c *gin.Context) {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
+			// if there are no days set the default to all
+			if len(habbit.Days) == 0 {
+				habbit.Days = []string{"monday", "tueday", "wednesday", "thursday",
+					"friday", "saturday", "sunday",
+				}
+			}
+
 			err = conn.QueryRow(
 				context.Background(),
 				"insert into habbits (user_id, name, days) VALUES ($1, $2, $3) RETURNING habbit_id",

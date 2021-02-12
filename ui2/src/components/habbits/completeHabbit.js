@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { green } from '@material-ui/core/colors';
 import DoneRounded from '@material-ui/icons/DoneRounded';
-import { Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 
 import { API } from '../../http'
@@ -40,13 +40,15 @@ export default function CompleteHabbit(props){
     }
 
     return (
-        <Box textAlign="right" width='100%' className={classes.completeHabbit}>
+        <Button>
+        {/* <Box textAlign="right" width='100%' className={classes.completeHabbit}> */}
             <DoneRounded
                 className={hovered || completed ? classes.colorCheckButton : classes.checkButton}
                 onMouseEnter={toggleHovered}
                 onMouseLeave={toggleHovered}
                 onClick={completeHabbit}
             />
-        </Box>
+        {/* </Box> */}
+        </Button>
     )
 }

@@ -56,14 +56,16 @@ export default function Habbit(props){
                     <Typography variant="subtitle2">Next Due: {nextDue}</Typography>
                 </CardContent>
             </Box>
-            <CardActions>
-                <CompleteHabbit
-                    habbitID={props.habbitID}
-                    completed={props.completedToday}
-                    dueDates={props.dueDates}
-                    onCompleteChange={() => changeNextDue()}
-                />
-            </CardActions>
+            <Box display="flex" justifyContent="flex-end">
+                <CardActions>
+                    <CompleteHabbit
+                        habbitID={props.habbitID}
+                        completed={props.completedToday}
+                        dueDates={props.dueDates}
+                        onCompleteChange={() => changeNextDue()}
+                    />
+                </CardActions>
+            </Box>
         </Card>
     )
 }

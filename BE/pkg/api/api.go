@@ -64,6 +64,7 @@ func CreateRoutes() {
 	router := gin.Default()
 	router.Use(AddDatabaseConnection(connection))
 	router.Use(AddUser(connection))
+	router.Use(gin.Recovery())
 
 	// version the api
 	router.GET("/health_check", healthCheck)
