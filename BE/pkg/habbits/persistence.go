@@ -1,4 +1,4 @@
-package persistence
+package habbits
 
 import (
 	"context"
@@ -8,22 +8,38 @@ import (
 )
 
 // HabbitsByUser returns habbit_id,user_id,name
-func HabbitsByUser(conn *pgx.Conn, userID int, filter bool) pgx.Rows {
+func HabbitsByUser(conn *pgx.Conn, userID int, filter bool) (pgx.Rows, error) {
 	if filter {
-		rows, _ := conn.Query(
+		rows, err := conn.Query(
 			context.Background(),
 			"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1 AND last_completed::date = now()::date;",
 			userID,
 		)
-		return rows
+		return rows, err
 	} else {
-		rows, _ := conn.Query(
+		rows, err := conn.Query(
 			context.Background(),
 			"SELECT habbit_id, user_id, name, days, last_completed FROM habbits WHERE user_id=$1",
 			userID,
 		)
-		return rows
+		return rows, err
 	}
+}
+
+// DBUpdateHabbit updates a habbit in the DB
+func DBUpdateHabbit(conn *pgx.Conn, userID int, habbit Habbit) error {
+
+	commandTag, err := conn.Exec(
+		context.Background(),
+		"UPDATE habbits SET name=$1, days=$2 WHERE habbit_id=$3 AND user_id=$4",
+		habbit.Name, habbit.Days, habbit.HabbitID, userID,
+	)
+
+	if commandTag.RowsAffected() == 0 {
+		return &HabbitNotFoundError{msg: "habbit not found."}
+	}
+
+	return err
 }
 
 // CompletedHabbitsToday returns the number of completed habbits against a habbit today
@@ -73,17 +89,13 @@ func UpdateLastCompleted(conn *pgx.Conn, habbitID int) error {
 	return nil
 }
 
-// DeleteHabbit removes the habbit if the user owns in
-func DeleteHabbit(conn *pgx.Conn, userID int, habbitID int) error {
+// DBDeleteHabbit removes the habbit if the user owns in
+func DBDeleteHabbit(conn *pgx.Conn, userID int, habbitID int) error {
 	_, err := conn.Exec(
 		context.Background(),
 		"DELETE FROM habbits WHERE habbit_id=$1 AND user_id=$2",
 		habbitID, userID,
 	)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
