@@ -3,14 +3,15 @@ package habbits
 import (
 	"context"
 	"database/sql"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 
 	"github.com/kieranlavelle/vita-intellectus/pkg/helpers"
-	"github.com/kieranlavelle/vita-intellectus/pkg/persistence"
 )
 
 // AddHabbit creates a new habbit for the user in the database
@@ -37,6 +38,7 @@ func AddHabbit(c *gin.Context) {
 			}
 
 			habbit.UserID = user.UserID
+			habbit.setDueDates()
 			c.JSON(http.StatusOK, habbit)
 			return
 		}
@@ -51,47 +53,71 @@ func GetHabbits(c *gin.Context) {
 	filter := habbitsFilter == "due"
 
 	var habbit Habbit
-	var habbits []Habbit
 	var lastCompleted sql.NullTime
+	habbits := []Habbit{}
 
-	if conn, err := helpers.DatabaseConnection(c); err == nil {
-		if user, err := helpers.RequestUser(c); err == nil {
+	conn, err := helpers.DatabaseConnection(c)
+	if err != nil {
+		log.Printf("Failed to connect to DB: %v\n", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
 
-			rows := persistence.HabbitsByUser(conn, user.UserID, filter)
-			for rows.Next() {
-				err := rows.Scan(
-					&habbit.HabbitID,
-					&habbit.UserID,
-					&habbit.Name,
-					&habbit.Days,
-					&lastCompleted,
-				)
-				if err != nil {
-					c.AbortWithStatus(http.StatusInternalServerError)
-					return
-				}
+	user, err := helpers.RequestUser(c)
+	if err != nil {
+		log.Printf("Failed to get user: %v\n", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
 
-				lYear, lMonth, lday := lastCompleted.Time.Date()
-				year, month, day := time.Now().Date()
-
-				validYear := lYear == year
-				validMonth := lMonth == month
-				validDay := lday == day
-
-				if validDay && validMonth && validYear {
-					habbit.CompletedToday = true
-				} else {
-					habbit.CompletedToday = false
-				}
-
-				// add the habbit into a slice
-				habbit = habbit.setDueDates()
-				habbits = append(habbits, habbit)
-			}
+	rows, err := HabbitsByUser(conn, user.UserID, filter)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			c.JSON(http.StatusOK, gin.H{
+				"habbits": habbits,
+			})
+			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "failed to get user habbits.",
+			})
+			return
 		}
 	}
 
-	c.JSON(http.StatusOK, habbits)
+	for rows.Next() {
+		err := rows.Scan(
+			&habbit.HabbitID,
+			&habbit.UserID,
+			&habbit.Name,
+			&habbit.Days,
+			&lastCompleted,
+		)
+		if err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		lYear, lMonth, lday := lastCompleted.Time.Date()
+		year, month, day := time.Now().Date()
+
+		validYear := lYear == year
+		validMonth := lMonth == month
+		validDay := lday == day
+
+		if validDay && validMonth && validYear {
+			habbit.CompletedToday = true
+		} else {
+			habbit.CompletedToday = false
+		}
+
+		// add the habbit into a slice
+		habbit = habbit.setDueDates()
+		habbits = append(habbits, habbit)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"habbits": habbits,
+	})
 }
 
 // CompleteHabbit add's a habbit_completion
@@ -100,12 +126,12 @@ func CompleteHabbit(c *gin.Context) {
 		completeHabbitBody := CompleteHabbitBody{}
 		c.BindJSON(&completeHabbitBody)
 
-		err := persistence.AddTrackedHabbit(conn, completeHabbitBody.HabbitID)
+		err := AddTrackedHabbit(conn, completeHabbitBody.HabbitID)
 		if err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 		}
 
-		err = persistence.UpdateLastCompleted(conn, completeHabbitBody.HabbitID)
+		err = UpdateLastCompleted(conn, completeHabbitBody.HabbitID)
 		if err != nil {
 			c.AbortWithStatus(http.StatusInternalServerError)
 		}
@@ -143,11 +169,57 @@ func DeleteHabbit(c *gin.Context) {
 	}
 
 	//Delete habbit
-	err = persistence.DeleteHabbit(conn, user.UserID, habbitID)
+	err = DBDeleteHabbit(conn, user.UserID, habbitID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
 	c.AbortWithStatus(http.StatusOK)
+}
+
+// UpdateHabbit changes the variable properties of a habbit
+func UpdateHabbit(c *gin.Context) {
+
+	habbit := Habbit{}
+	err := c.ShouldBindJSON(&habbit)
+	if err != nil {
+		log.Printf("Error parsing body %v\n", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"detail": "expected valid habbit in body.",
+		})
+	}
+
+	conn, err := helpers.DatabaseConnection(c)
+	if err != nil {
+		log.Printf("Failed to connect to DB: %v\n", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+
+	user, err := helpers.RequestUser(c)
+	if err != nil {
+		log.Printf("Failed to get user: %v\n", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+
+	err = DBUpdateHabbit(conn, user.UserID, habbit)
+	if err != nil {
+		switch err.(type) {
+		case *HabbitNotFoundError:
+			c.JSON(http.StatusNotFound, gin.H{
+				"detail": "please pass a valid habbit_id for a habbit you own.",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "error updating habbit. Please try again.",
+			})
+		}
+		return
+	}
+
+	habbit = habbit.setDueDates()
+	c.JSON(http.StatusOK, gin.H{
+		"habbit": habbit,
+	})
+
 }
