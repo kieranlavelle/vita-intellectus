@@ -45,7 +45,10 @@ export default function Habbit(props){
             className={classes.habbitCard}
             onMouseEnter={() => setElevation(10)}
             onMouseLeave={() => setElevation(5)}
-            onClick={() => redirect(`/habbit/${props.habbitID}`)}
+            onClick={(e) => {
+                e.preventDefault();
+                redirect(`/habbit/${props.habbitID}`);
+            }}
         >
             <Box textAlign="left" fontFamily="verdana" fontWeight="fontWeightLight">
                 <CardContent>

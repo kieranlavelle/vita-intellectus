@@ -35,15 +35,13 @@ func AddDatabaseConnection(conn *pgx.Conn) gin.HandlerFunc {
 // AddUser add's a user object to the request context
 func AddUser(conn *pgx.Conn) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method != "OPTIONS" {
-			username := c.GetHeader("X-Authenticated-UserId")
-			user, err := users.GetUser(conn, username)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
-				return
-			}
-			c.Set("user", user)
+		username := c.GetHeader("X-Authenticated-UserId")
+		user, err := users.GetUser(conn, username)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"detail": "Internal Server Error."})
+			return
 		}
+		c.Set("user", user)
 		c.Next()
 	}
 }

@@ -128,13 +128,6 @@ func GetHabbits(c *gin.Context) {
 			notDueHabbits = append(notDueHabbits, habbit)
 		}
 
-		// if habbit.CompletedToday {
-		// 	completedHabbits = append(completedHabbits, habbit)
-		// }
-
-		// // add the habbit into a slice
-		// habbit = habbit.setDueDates()
-		// habbits = append(habbits, habbit)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
