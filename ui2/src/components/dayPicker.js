@@ -35,16 +35,11 @@ export default function DayPicker(props){
     const [days, setDays] = useState(props.selectedDays ? props.selectedDays : []);
     const classes = useStyles();
 
-    const ToggleDay = (day) => {
-
+    const ToggleDay = async day => {
         if (days.includes(day)) {
-            const newDays = days.filter(iDay => iDay != day);
-            setDays(newDays);
+            await setDays(days.filter(iDay => iDay != day));
         } else {
-            setDays([
-                ...days,
-                day
-            ]);
+            await setDays([...days, day]);
         }
     }
 
