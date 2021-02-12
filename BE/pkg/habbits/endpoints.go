@@ -156,7 +156,7 @@ func CompleteHabbit(c *gin.Context) {
 	}
 
 	completeHabbitBody := CompleteHabbitBody{}
-	err := c.BindJSON(&completeHabbitBody)
+	err = c.BindJSON(&completeHabbitBody)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"detail": "invalid request body.",
