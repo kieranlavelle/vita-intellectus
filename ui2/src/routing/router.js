@@ -1,5 +1,4 @@
 import React from "react"
-import { makeStyles } from '@material-ui/core/styles';
 
 import {
     BrowserRouter,
@@ -10,34 +9,14 @@ import {
 
 import Register from '../views/register'
 import Login from '../views/login'
-import Habbits from '../views/habbits'
-import Habbit from '../views/habbit'
+import Habits from '../views/habits'
+import Habit from '../views/habit'
 import Navigation from '../components/nav'
 
 import useStickyState from '../state/store'
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-      flexGrow: 1,
-    },
-    menuButton: {
-      marginRight: theme.spacing(2),
-    },
-    appBar: {
-      'background-color': 'white',
-      'color': 'black'
-    },
-    button: {
-      fontWeight: 'bold'
-    },
-    contentContainer: {
-      height: '100%'
-    }
-
-}));
 
 function GuardedRoute(props) {
-    const classes = useStyles();
     const [token, setToken] = useStickyState("token", '');
 
     if (token != "") {
@@ -70,20 +49,20 @@ export default function Router(){
                     path="/"
                     render={() => {
                         return (
-                            token != "" ? <Redirect to='/habbits'/> : <Redirect to='/login'/>
+                            token != "" ? <Redirect to='/habits'/> : <Redirect to='/login'/>
                         )
                     }}
                 />
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/register" component={Register} />
-                <GuardedRoute exact path="/habbits">
+                <GuardedRoute exact path="/habits">
                     <Navigation>
-                        <Habbits />
+                        <Habits />
                     </Navigation>
                 </GuardedRoute>
-                <GuardedRoute exact path="/habbit/:id" children={Habbit}>
+                <GuardedRoute exact path="/habit/:id" children={Habit}>
                     <Navigation>
-                        <Habbit />
+                        <Habit />
                     </Navigation>
                 </GuardedRoute>
             </Switch>

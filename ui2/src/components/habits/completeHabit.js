@@ -16,13 +16,13 @@ const useStyles = makeStyles((theme) => ({
         color: green[500],
         transform: 'scale(1.3)'
     },
-    completeHabbit: {
+    completeHabit: {
         width: '100%'
     }
 }));
 
 
-export default function CompleteHabbit(props){
+export default function CompleteHabit(props){
     const classes = useStyles()
     const [hovered, setHovered] = useState(false);
     const [completed, setCompleted] = useState(props.completed);
@@ -31,8 +31,8 @@ export default function CompleteHabbit(props){
 
     const config = GetAuthHeaders()
 
-    const completeHabbit = () => {
-        API.put("/habbits/complete", {'habbit_id': props.habbitID}, config)
+    const completeHabit = () => {
+        API.put("/habit/complete", {'habit_id': props.habitID}, config)
            .then(response => {
                 setCompleted(true);
                 props.onCompleteChange();
@@ -45,7 +45,7 @@ export default function CompleteHabbit(props){
                 className={hovered || completed ? classes.colorCheckButton : classes.checkButton}
                 onMouseEnter={toggleHovered}
                 onMouseLeave={toggleHovered}
-                onClick={completeHabbit}
+                onClick={completeHabit}
             />
         </Button>
     )

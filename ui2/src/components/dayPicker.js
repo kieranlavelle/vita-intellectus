@@ -21,16 +21,6 @@ const useStyles = makeStyles((theme) => ({
       },
 }));
 
-const Weekdays = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday'
-]
-
 export default function DayPicker(props){
     const [days, setDays] = useState(props.selectedDays ? props.selectedDays : []);
     const classes = useStyles();

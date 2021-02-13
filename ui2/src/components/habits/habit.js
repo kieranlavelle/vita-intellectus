@@ -5,10 +5,10 @@ import { useHistory } from 'react-router-dom'
 import { Box, Card, CardActionArea, CardActions, CardContent, Typography } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 
-import CompleteHabbit from './completeHabbit'
+import CompleteHabit from './completeHabit'
 
 const useStyles = makeStyles((theme) => ({
-    habbitCard: {
+    habitCard: {
         margin: '1%',
         [theme.breakpoints.down('sm')]: {
             width: '100%',
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
 
   }));
 
-export default function Habbit(props){
+export default function Habit(props){
     const classes = useStyles();
     const [elevation, setElevation] = useState(5);
     const [showDialog, setShowDialog] = useState(false);
@@ -42,11 +42,11 @@ export default function Habbit(props){
         <Card
             variant="elevation"
             elevation={elevation}
-            className={classes.habbitCard}
+            className={classes.habitCard}
             onMouseEnter={() => setElevation(10)}
             onMouseLeave={() => setElevation(5)}
         >
-            <CardActionArea onClick={() => redirect(`/habbit/${props.habbitID}`)}>
+            <CardActionArea onClick={() => redirect(`/habit/${props.habitID}`)}>
                 <Box textAlign="left" fontFamily="verdana" fontWeight="fontWeightLight">
                     <CardContent>
                         <Typography variant="overline">{props.name}</Typography>
@@ -57,8 +57,8 @@ export default function Habbit(props){
 
             <Box display="flex" justifyContent="flex-end">
                 <CardActions>
-                    <CompleteHabbit
-                        habbitID={props.habbitID}
+                    <CompleteHabit
+                        habitID={props.habbitID}
                         completed={props.completedToday}
                         dueDates={props.dueDates}
                         onCompleteChange={() => changeNextDue()}

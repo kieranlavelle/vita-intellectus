@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react'
-
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import { Button } from '@material-ui/core';
@@ -12,13 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const filterNames = [
-    'due',
-    'completed',
-    'not_due'
-]
-
-export default function HabbitFilter(props){
+export default function HabitFilter(props){
     const classes = useStyles();
     // const [filters, setFilters] = useState(
     //   props.defaultFilter ? props.defaultFilter : []

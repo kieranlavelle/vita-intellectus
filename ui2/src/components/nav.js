@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
       <div className={classes.contentContainer}>
         <AppBar position="static" className={classes.appBar}>
             <Toolbar className={classes.toolbar}>
-                <Button className={classes.button} onClick={() => redirect('/habbits')}>Habbits</Button>
+                <Button className={classes.button} onClick={() => redirect('/habits')}>Habits</Button>
                 <Box textAlign="right" width='100%' fontWeight='bold'>
                   <Button onClick={() => setToken('')} className={classes.button}>logout</Button>
                 </Box>

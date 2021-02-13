@@ -36,7 +36,7 @@ export default function LoginForm(){
     const [token, setToken] = useStickyState('token', '');
 
     const history = useHistory()
-    const onLogin = useCallback(() => history.push('/habbits'), [history]);
+    const onLogin = useCallback(() => history.push('/habits'), [history]);
 
     const onSubmit = (data) => {
         const formData = new FormData();

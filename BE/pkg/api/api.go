@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v4"
 
 	"github.com/kieranlavelle/vita-intellectus/pkg/habits"
 	"github.com/kieranlavelle/vita-intellectus/pkg/users"
@@ -25,9 +25,7 @@ func connectToDatabase() *pgx.Conn {
 // AddDatabaseConnection add's a connection to the request context
 func AddDatabaseConnection(conn *pgx.Conn) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method != "OPTIONS" {
-			c.Set("databaseConnection", conn)
-		}
+		c.Set("databaseConnection", conn)
 		c.Next()
 	}
 }
@@ -69,14 +67,12 @@ func CreateRoutes() {
 	// version the api
 	router.GET("/health_check", healthCheck)
 
-	router.POST("/habits", habits.AddHabit)
-	router.GET("/habits", habits.GetHabits)
+	router.POST("/habit", habits.AddHabit)
+	router.PUT("/habit/complete", habits.CompleteHabit)
+	router.DELETE("/habit/:habitID", habits.DeleteHabit)
 	router.PUT("/habit", habits.UpdateHabit)
 
-	//depricate this
-	router.PUT("/habits/complete", habits.CompleteHabit)
-
-	router.DELETE("/habit/:habitID", habits.DeleteHabit)
+	router.GET("/habits", habits.GetHabits)
 
 	router.Run("0.0.0.0:8004")
 }

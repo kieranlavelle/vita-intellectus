@@ -1,0 +1,88 @@
+swagger: "2.0"
+info:
+  description: "A simple documentation of the API available."
+  version: "1.0.0"
+  title: "Vita"
+  contact:
+    email: "kmplavelle@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "node404.com"
+basePath: "/gateway/vita"
+schemes:
+- "https"
+- "http"
+paths:
+  /habit:
+    post:
+      tags:
+      - "habit"
+      summary: "Add a new habit"
+      description: ""
+      operationId: "addHabit"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "The new habit you want to create."
+        required: true
+        schema:
+          $ref: "#/definitions/AddHabitRequestBody"
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: "#/definitions/AddHabitResponseBody"
+
+definitions:
+  AddHabitRequestBody:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      days:
+        type: "array"
+        items:
+          type: "string"
+    example:
+      simple:
+        name: "Meditation"
+        days: ["monday", "tuesday"]
+  AddHabitResponseBody:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+      user_id:
+        type: "integer"
+      name:
+        type: "string"
+      completed:
+        type: "boolean"
+      due_dates:
+        type: "array"
+        items:
+          type: "object"
+          properties:
+            next_due:
+              type: "string"
+            next_due_on_completed:
+              type: "string"
+      days:
+        type: "array"
+        items:
+          type: "string"
+    example:
+        id: 121
+        user_id: 12
+        name: "Meditation"
+        days: ["monday", "tuesday"]
+        due_dates:
+          next_due: "Tomorrow"
+          next_due_on_completed: "Wednesday"
+
+

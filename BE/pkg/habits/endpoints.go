@@ -204,8 +204,8 @@ func CompleteHabit(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"detail": "success"})
 }
 
-// DeleteHabbit removes the habbit specified
-func DeleteHabbit(c *gin.Context) {
+// DeleteHabit removes the habbit specified
+func DeleteHabit(c *gin.Context) {
 
 	// form the DB connection
 	conn, err := helpers.DatabaseConnection(c)

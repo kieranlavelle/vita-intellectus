@@ -33,8 +33,6 @@ export default function RegisterForm(){
     const {register, handleSubmit, errors} = useForm();
     const classes = useStyles();
 
-    const [token, setToken] = useStickyState('token', '');
-
     const history = useHistory()
     const redirect = useCallback((path) => history.push(path), [history]);
 
