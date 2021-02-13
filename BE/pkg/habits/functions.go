@@ -1,4 +1,4 @@
-package habbits
+package habits
 
 import (
 	"strings"
@@ -34,7 +34,7 @@ func contains(days []string, day string) bool {
 	return false
 }
 
-func (h Habbit) setDueDates() Habbit {
+func (h Habit) setDueDates() Habit {
 
 	dueDates := DueDates{}
 

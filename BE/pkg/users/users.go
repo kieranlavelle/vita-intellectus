@@ -8,7 +8,7 @@ import (
 
 // User represents a user in the database
 type User struct {
-	UserID   int
+	ID       int
 	Username string
 }
 
@@ -31,7 +31,7 @@ func GetUser(conn *pgx.Conn, username string) (User, error) {
 	}
 
 	if userID != -1 {
-		return User{UserID: userID, Username: username}, nil
+		return User{ID: userID, Username: username}, nil
 	}
 
 	err = conn.QueryRow(
@@ -44,5 +44,5 @@ func GetUser(conn *pgx.Conn, username string) (User, error) {
 		return User{}, err
 	}
 
-	return User{UserID: userID, Username: username}, nil
+	return User{ID: userID, Username: username}, nil
 }

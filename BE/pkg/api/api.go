@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx"
 
-	"github.com/kieranlavelle/vita-intellectus/pkg/habbits"
+	"github.com/kieranlavelle/vita-intellectus/pkg/habits"
 	"github.com/kieranlavelle/vita-intellectus/pkg/users"
 )
 
@@ -69,14 +69,14 @@ func CreateRoutes() {
 	// version the api
 	router.GET("/health_check", healthCheck)
 
-	router.POST("/habbits", habbits.AddHabbit)
-	router.GET("/habbits", habbits.GetHabbits)
-	router.PUT("/habbit", habbits.UpdateHabbit)
+	router.POST("/habits", habits.AddHabit)
+	router.GET("/habits", habits.GetHabits)
+	router.PUT("/habit", habits.UpdateHabit)
 
 	//depricate this
-	router.PUT("/habbits/complete", habbits.CompleteHabbit)
+	router.PUT("/habits/complete", habits.CompleteHabit)
 
-	router.DELETE("/habbit/:habbitID", habbits.DeleteHabbit)
+	router.DELETE("/habit/:habitID", habits.DeleteHabit)
 
 	router.Run("0.0.0.0:8004")
 }
