@@ -30,7 +30,7 @@ export default function Habit(props){
             ]
 
             setHabit(allHabits.filter(
-                habit => habit.habit_id == props.id
+                habit => habit.id == props.id
             )[0]);
         })
     }, [])

@@ -58,7 +58,7 @@ export default function Habit(props){
             <Box display="flex" justifyContent="flex-end">
                 <CardActions>
                     <CompleteHabit
-                        habitID={props.habbitID}
+                        habitID={props.habitID}
                         completed={props.completedToday}
                         dueDates={props.dueDates}
                         onCompleteChange={() => changeNextDue()}
