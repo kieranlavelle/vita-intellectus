@@ -1,6 +1,7 @@
 FROM golang
 
 ENV GO111MODULE=on
+ENV GIN_MODE=release
 
 WORKDIR /app
 

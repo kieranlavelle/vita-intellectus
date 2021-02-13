@@ -74,11 +74,11 @@ func AddHabit(c *gin.Context) {
 // GetHabits get's every habbit for a user
 func GetHabits(c *gin.Context) {
 
-	var habit Habit
-
 	completedHabits := []Habit{}
 	dueHabits := []Habit{}
 	notDueHabits := []Habit{}
+
+	allHabits := []Habit{}
 
 	conn, err := helpers.DatabaseConnection(c)
 	if err != nil {
@@ -117,6 +117,9 @@ func GetHabits(c *gin.Context) {
 	}
 
 	for rows.Next() {
+
+		habit := Habit{}
+
 		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Days)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -125,6 +128,10 @@ func GetHabits(c *gin.Context) {
 			return
 		}
 
+		allHabits = append(allHabits, habit)
+	}
+
+	for _, habit := range allHabits {
 		completedToday, err := DBCompletedHabitsToday(conn, habit.ID)
 		if err != nil {
 			log.Printf("error when getting habit count: %v\n", err)
@@ -151,7 +158,6 @@ func GetHabits(c *gin.Context) {
 		} else {
 			notDueHabits = append(notDueHabits, habit)
 		}
-
 	}
 
 	c.JSON(http.StatusOK, gin.H{
