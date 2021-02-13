@@ -64,8 +64,6 @@ func CreateRoutes() {
 	router := gin.Default()
 
 	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-
-		// your custom format
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s %s\"\n",
 			param.TimeStamp.Format(time.RFC1123),
 			param.Request.Header.Get("X-Authenticated-UserId"),

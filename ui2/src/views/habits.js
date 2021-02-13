@@ -11,6 +11,7 @@ import HabitsFilter from '../components/habits/habitsFilter'
 import useSynState from '../state/synState'
 import useStickyState from '../state/store'
 import { API } from '../http'
+import { Button } from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -54,8 +55,8 @@ export default function Habits() {
             setHabits(response.data.due);
             setCompletedHabits(response.data.completed);
             setnotDueHabits(response.data.not_due);
-        })
-    }, []);
+        }, [habits, completedHabits, notDueHabits])
+    });
 
 
     const dueHabitsList = habits.map((habit) => (
