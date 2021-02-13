@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom'
 
 import Box from '@material-ui/core/Box'
@@ -56,7 +56,7 @@ export default function Habits() {
             setCompletedHabits(response.data.completed);
             setnotDueHabits(response.data.not_due);
         })
-    }, [habits, completedHabits, notDueHabits]);
+    }, []);
 
 
     const dueHabitsList = habits.map((habit) => (
