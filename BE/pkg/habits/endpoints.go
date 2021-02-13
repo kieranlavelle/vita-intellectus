@@ -53,7 +53,7 @@ func AddHabit(c *gin.Context) {
 
 	err = conn.QueryRow(
 		context.Background(),
-		"insert into habits (user_id, name, days) VALUES ($1, $2, $3) RETURNING habit_id",
+		"insert into habits (user_id, name, days) VALUES ($1, $2, $3) RETURNING id",
 		user.ID, habit.Name, habit.Days,
 	).Scan(&habit.ID)
 
