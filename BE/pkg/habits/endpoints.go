@@ -191,15 +191,6 @@ func CompleteHabit(c *gin.Context) {
 		return
 	}
 
-	err = UpdateLastCompleted(conn, completeHabitBody.HabitID)
-	if err != nil {
-		log.Printf("error updating last completed: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"detail": "please try again later",
-		})
-		return
-	}
-
 	//TODO: Alter to have new Habbit returned
 	c.JSON(http.StatusOK, gin.H{"detail": "success"})
 }
@@ -210,7 +201,7 @@ func DeleteHabit(c *gin.Context) {
 	// form the DB connection
 	conn, err := helpers.DatabaseConnection(c)
 	if err != nil {
-		log.Printf("failed to get DB connection: %v\n")
+		log.Printf("failed to get DB connection: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"detail": "please try again later.",
 		})
@@ -220,7 +211,7 @@ func DeleteHabit(c *gin.Context) {
 	// get the user making the request
 	user, err := helpers.RequestUser(c)
 	if err != nil {
-		log.Printf("failed to get user: %v\n")
+		log.Printf("failed to get user: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"detail": "please try again later.",
 		})

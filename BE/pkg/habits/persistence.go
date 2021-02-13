@@ -11,7 +11,7 @@ import (
 func DBHabitsByUser(conn *pgx.Conn, userID int) (pgx.Rows, error) {
 	return conn.Query(
 		context.Background(),
-		"SELECT habit_id, user_id, name, days FROM habits WHERE user_id=$1",
+		"SELECT id, user_id, name, days FROM habits WHERE user_id=$1",
 		userID,
 	)
 }
@@ -21,7 +21,7 @@ func DBUpdateHabit(conn *pgx.Conn, userID int, habit Habit) error {
 
 	commandTag, err := conn.Exec(
 		context.Background(),
-		"UPDATE habits SET name=$1, days=$2 WHERE habit_id=$3 AND user_id=$4",
+		"UPDATE habits SET name=$1, days=$2 WHERE id=$3 AND user_id=$4",
 		habit.Name, habit.Days, habit.ID, userID,
 	)
 
@@ -59,21 +59,11 @@ func AddTrackedHabit(conn *pgx.Conn, habitID int) error {
 	return err
 }
 
-// UpdateLastCompleted updates the last_completed field in the habbits table
-func UpdateLastCompleted(conn *pgx.Conn, habitID int) error {
-	_, err := conn.Exec(
-		context.Background(),
-		"UPDATE habits SET last_completed=$1 WHERE habit_id=$2",
-		time.Now().UTC(), habitID,
-	)
-	return err
-}
-
 // DBDeleteHabit removes the habit if the user owns in
 func DBDeleteHabit(conn *pgx.Conn, userID int, habitID int) error {
 	_, err := conn.Exec(
 		context.Background(),
-		"DELETE FROM habits WHERE habit_id=$1 AND user_id=$2",
+		"DELETE FROM habits WHERE id=$1 AND user_id=$2",
 		habitID, userID,
 	)
 
