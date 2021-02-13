@@ -2,9 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -53,13 +55,30 @@ func healthCheck(ctx *gin.Context) {
 func CreateRoutes() {
 
 	//setup logging
-	log.SetOutput(gin.DefaultWriter)
+	// log.SetOutput(gin.DefaultWriter)
 
 	// form a connection to the database
 	connection := connectToDatabase()
 	defer connection.Close(context.Background())
 
 	router := gin.Default()
+
+	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+
+		// your custom format
+		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
+			param.TimeStamp.Format(time.RFC1123),
+			param.Request.Header.Get("X-Authenticated-UserId"),
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.Request.UserAgent(),
+			param.ErrorMessage,
+		)
+	}))
+
 	router.Use(AddDatabaseConnection(connection))
 	router.Use(AddUser(connection))
 	router.Use(gin.Recovery())
