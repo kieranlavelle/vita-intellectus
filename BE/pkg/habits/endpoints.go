@@ -138,6 +138,7 @@ func GetHabits(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"detail": "please try again later",
 			})
+			return
 		}
 
 		if completedToday > 0 {
