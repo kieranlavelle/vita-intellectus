@@ -56,6 +56,11 @@ export default function Habits() {
             setnotDueHabits(response.data.not_due);
         })
     }, []);
+    // API.get("/habits", config).then(response => {
+    //     setHabits(response.data.due);
+    //     setCompletedHabits(response.data.completed);
+    //     setnotDueHabits(response.data.not_due);
+    // });
 
 
     const dueHabitsList = habits.map((habit) => (
