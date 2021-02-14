@@ -5,12 +5,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - '7995:80'
+    expose:
+      - '80'
+    environment:
+          VIRTUAL_HOST: vita.node404.com
+          LETSENCRYPT_HOST: vita.node404.com
+          LETSENCRYPT_EMAIL: kmplavelle@gmail.com
     networks:
-      - reverse-proxy-network
+      - webproxy
 
-networks:
-  reverse-proxy-network:
-    external:
-      name: reverse-proxy-network
+networks:    
+    webproxy:
+        external: true

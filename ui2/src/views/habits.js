@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom'
 
 import Box from '@material-ui/core/Box'
 import { makeStyles } from '@material-ui/core/styles';
@@ -35,13 +34,14 @@ export default function Habits() {
     const [habits, setHabits] = useState([]);
     const [completedHabits, setCompletedHabits] = useState([]);
     const [notDueHabits, setnotDueHabits] = useState([]);
+    const [triggerFetchHabits, settriggerFetchHabits] = useState(0);
     const filters = useSynState(['due', 'not_due', 'completed']);
 
     const addNewHabit = (habit) => {
         setHabits([...habits, habit]);
     }
-
     const filterHabits = new_filters => filters.set(new_filters)
+    const fetchHabits = () => settriggerFetchHabits(triggerFetchHabits+1)
 
     const config = {
         headers: {
@@ -54,13 +54,9 @@ export default function Habits() {
             setHabits(response.data.due);
             setCompletedHabits(response.data.completed);
             setnotDueHabits(response.data.not_due);
-        })
-    }, []);
-    // API.get("/habits", config).then(response => {
-    //     setHabits(response.data.due);
-    //     setCompletedHabits(response.data.completed);
-    //     setnotDueHabits(response.data.not_due);
-    // });
+        });
+        console.log("in effect")
+    }, [triggerFetchHabits]);
 
 
     const dueHabitsList = habits.map((habit) => (
@@ -71,6 +67,7 @@ export default function Habits() {
             dueDates={habit.due_dates}
             completedToday={habit.completed}
             habitID={habit.id}
+            onComplete={fetchHabits}
         />
     ));
 
@@ -82,6 +79,7 @@ export default function Habits() {
             dueDates={habit.due_dates}
             completedToday={habit.completed}
             habitID={habit.id}
+            onComplete={fetchHabits}
         />
     ));
 
@@ -93,6 +91,7 @@ export default function Habits() {
             dueDates={habit.due_dates}
             completedToday={habit.completed}
             habitID={habit.id}
+            onComplete={fetchHabits}
         />
     ));
     

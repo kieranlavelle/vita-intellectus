@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 export const API = axios.create({
-    baseURL: `https://node404.com/gateway/vita`
+    baseURL: `https://gateway.node404.com/vita`
 })
 
 export const AUTH = axios.create({
-    baseURL: `https://node404.com/auth`
+    baseURL: `https://auth.node404.com/`
 })

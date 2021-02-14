@@ -35,7 +35,7 @@ export default function CompleteHabit(props){
         API.put("/habit/complete", {'habit_id': props.habitID}, config)
            .then(response => {
                 setCompleted(true);
-                props.onCompleteChange();
+                props.onCompleted();
            })
     }
 

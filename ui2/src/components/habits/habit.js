@@ -35,7 +35,11 @@ export default function Habit(props){
     const history = useHistory()
     const redirect = useCallback((path) => history.push(path), [history]);
 
-    const changeNextDue = () => setNextDue(props.dueDates.next_due_on_completed);
+    const onCompleted = () => {
+        setNextDue(props.dueDates.next_due_on_completed);
+        props.onComplete();
+        console.log("In habit onCompleted")
+    };
 
 
     return (
@@ -61,7 +65,7 @@ export default function Habit(props){
                         habitID={props.habitID}
                         completed={props.completedToday}
                         dueDates={props.dueDates}
-                        onCompleteChange={() => changeNextDue()}
+                        onCompleted={onCompleted}
                     />
                 </CardActions>
             </Box>

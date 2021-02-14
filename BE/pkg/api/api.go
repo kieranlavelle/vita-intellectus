@@ -64,8 +64,6 @@ func CreateRoutes() {
 	router := gin.Default()
 
 	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-
-		// your custom format
 		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s %s\"\n",
 			param.TimeStamp.Format(time.RFC1123),
 			param.Request.Header.Get("X-Authenticated-UserId"),
@@ -89,6 +87,7 @@ func CreateRoutes() {
 	router.PUT("/habit/complete", habits.CompleteHabit)
 	router.DELETE("/habit/:habitID", habits.DeleteHabit)
 	router.PUT("/habit", habits.UpdateHabit)
+	router.GET("/habit/:habitID", habits.GetHabit)
 
 	router.GET("/habits", habits.GetHabits)
 

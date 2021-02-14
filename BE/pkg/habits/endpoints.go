@@ -168,6 +168,58 @@ func GetHabits(c *gin.Context) {
 	})
 }
 
+// GetHabit get's a single habit
+func GetHabit(c *gin.Context) {
+
+	habit := Habit{}
+
+	conn, err := helpers.DatabaseConnection(c)
+	if err != nil {
+		log.Printf("Failed to get DB connection: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later.",
+		})
+		return
+	}
+
+	user, err := helpers.RequestUser(c)
+	if err != nil {
+		log.Printf("Failed to get user: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later.",
+		})
+		return
+	}
+
+	habitID, err := strconv.Atoi(c.Param("habitID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"detail": "invalid habit id",
+		})
+		return
+	}
+
+	row := dbGetHabit(conn, user.ID, habitID)
+	err = row.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Days)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			c.JSON(http.StatusNotFound, gin.H{
+				"detail": "please pass a valid habit_id for the user.",
+			})
+			return
+		default:
+			log.Printf("error when getting user habbit id=%v: %v\n", habit.ID, err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "please try again later.",
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, habit)
+}
+
 // CompleteHabit add's a habbit_completion
 func CompleteHabit(c *gin.Context) {
 
