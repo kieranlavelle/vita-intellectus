@@ -16,7 +16,7 @@ export default function Habit(props){
     const config = GetAuthHeaders();
 
     const deleteHabit = () => {
-        API.delete(`/habit/${habit.habit_id}`, config)
+        API.delete(`/habit/${habit.id}`, config)
            .then(response => redirect('/habits'));
     }
 
