@@ -12,7 +12,7 @@ services:
     environment:
           VIRTUAL_PORT: 7995
           VIRTUAL_HOST: vita.node404.com
-          LETSENCRYPT_HSOT: vita.node404.com
+          LETSENCRYPT_HOST: vita.node404.com
           LETSENCRYPT_EMAIL: kmplavelle@gmail.com
     networks:
       - webproxy
