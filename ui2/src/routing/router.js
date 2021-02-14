@@ -42,7 +42,7 @@ export default function Router(){
     const [token, setToken] = useStickyState("token", '');
 
     return (
-        <BrowserRouter basename={'/vita'}>
+        <BrowserRouter>
             <Switch>
                 <Route
                     exact
