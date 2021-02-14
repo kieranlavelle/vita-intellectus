@@ -87,6 +87,7 @@ func CreateRoutes() {
 	router.PUT("/habit/complete", habits.CompleteHabit)
 	router.DELETE("/habit/:habitID", habits.DeleteHabit)
 	router.PUT("/habit", habits.UpdateHabit)
+	router.GET("/habit/:habitID", habits.GetHabit)
 
 	router.GET("/habits", habits.GetHabits)
 

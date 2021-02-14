@@ -70,6 +70,19 @@ func DBDeleteHabit(conn *pgx.Conn, userID int, habitID int) error {
 	return err
 }
 
+func dbGetHabit(conn *pgx.Conn, userID int, habitID int) pgx.Row {
+	query := `
+		SELECT
+			id, user_id, name, days
+		FROM
+			habits
+		WHERE
+			user_id=$1 AND id=$2
+	`
+
+	return conn.QueryRow(context.Background(), query, userID, habitID)
+}
+
 func dbCompletedHabits(conn *pgx.Conn, userID int, habitID int) (pgx.Rows, error) {
 
 	query := `
