@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useHistory } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
 
 import Box from '@material-ui/core/Box'
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,7 +10,6 @@ import HabitsFilter from '../components/habits/habitsFilter'
 import useSynState from '../state/synState'
 import useStickyState from '../state/store'
 import { API } from '../http'
-import { Button } from '@material-ui/core';
 
 
 const useStyles = makeStyles((theme) => ({
