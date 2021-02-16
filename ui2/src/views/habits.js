@@ -10,6 +10,7 @@ import HabitsFilter from '../components/habits/habitsFilter'
 import useSynState from '../state/synState'
 import useStickyState from '../state/store'
 import { API } from '../http'
+import { GetAuthHeaders } from '../auth';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -43,11 +44,7 @@ export default function Habits() {
     const filterHabits = new_filters => filters.set(new_filters)
     const fetchHabits = () => settriggerFetchHabits(triggerFetchHabits+1)
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }
+    const config = GetAuthHeaders()
 
     useEffect(() => {
         API.get("/habits", config).then(response => {
