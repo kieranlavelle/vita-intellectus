@@ -1,10 +1,9 @@
 <script>
-	export let name;
+	import Register from './views/Register.svelte'
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p class="font-bold">Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<Register />
 </main> 
 
 <style global>
