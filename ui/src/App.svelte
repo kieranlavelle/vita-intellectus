@@ -14,8 +14,7 @@
 	<Router url="{url}">
 		<Route path="/login" component={Login} />
 		<Route path="/register" component={Register} />
-		<!-- <Route path="/habits" component={Habits} /> -->
-		<ProtectedRoute path="/habits" componenet={Habits} redirect="/login" />
+		<ProtectedRoute path="/habits" component={Habits} redirect="/login" />
 	</Router>
 
 </main> 

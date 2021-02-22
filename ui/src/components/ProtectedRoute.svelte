@@ -1,6 +1,4 @@
 <script>
-import { onMount } from 'svelte';
-
     import { navigate, Route } from 'svelte-routing';
     import { token } from '../store'
 

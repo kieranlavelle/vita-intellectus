@@ -28,7 +28,7 @@
       <div class="max-w-md w-full space-y-8"></div>
           <div class="text-center">
               <h1 class="text-3xl font-extrabold text-gray-900">Register an account</h1>
-              <p class="mt-2">
+              <p class="mt-2" on:click={() => navigate('/login', {replace: true})}>
                   Or <a class="text-md text-indigo-600 hover:text-indigo-700">log in to your account</a>
               </p>
           </div>
@@ -50,7 +50,7 @@
                       </label>
                   </div>
                   <div class="text-sm">
-                      <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">
+                      <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">
                         Forgot your password?
                       </a>
                   </div>

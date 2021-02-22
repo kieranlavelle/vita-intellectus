@@ -14,10 +14,11 @@
 
         AUTH.post('/login', formData)
             .then(response => {
-                $token = response.data.access_token;
+                token.setToken(response.data.access_token);
                 navigate('/habits', {replace: true});
             })
             .catch(error => {
+                console.log(error);
                 errorMessage = error.response.data.detail;
             })
     }
