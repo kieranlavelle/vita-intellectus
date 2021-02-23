@@ -10,7 +10,10 @@ function createToken() {
             set(v);
             window.localStorage.setItem('token', v);
         },
-        reset: () => {set(null)}
+        reset: () => {
+            set(null);
+            window.localStorage.clear();
+        }
     };
 }
 

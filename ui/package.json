@@ -26,6 +26,7 @@
     "axios": "^0.21.1",
     "postcss-load-config": "^3.0.1",
     "sirv-cli": "^1.0.0",
+    "svelte-awesome": "^2.3.0",
     "svelte-routing": "^1.5.0"
   }
 }
