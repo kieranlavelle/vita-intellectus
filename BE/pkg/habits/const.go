@@ -1,6 +1,6 @@
 package habits
 
-var ALL_DAYS = []string{
+var allDays = []string{
 	"monday",
 	"tuesday",
 	"wednesday",

@@ -1,10 +1,5 @@
 package habits
 
-import (
-	"strings"
-	"time"
-)
-
 var weekdayOrdering = map[string]int{
 	"monday":    0,
 	"tuesday":   1,
@@ -34,47 +29,47 @@ func contains(days []string, day string) bool {
 	return false
 }
 
-func (h Habit) setDueDates() Habit {
+// func (h Habit) setDueDates() Habit {
 
-	dueDates := DueDates{}
+// 	dueDates := DueDates{}
 
-	today := strings.ToLower(time.Now().Weekday().String())
-	tomorrow := strings.ToLower(time.Now().Add(time.Hour * 24).Weekday().String())
+// 	today := strings.ToLower(time.Now().Weekday().String())
+// 	tomorrow := strings.ToLower(time.Now().Add(time.Hour * 24).Weekday().String())
 
-	todaysIndex := weekdayOrdering[today]
+// 	todaysIndex := weekdayOrdering[today]
 
-	// Convert the Habbit's days into indexes
-	daysAfterToday, daysBeforeToday := []int{}, []int{}
-	for _, day := range h.Days {
-		if index := weekdayOrdering[day]; index < todaysIndex {
-			daysBeforeToday = append(daysBeforeToday, index)
-		} else {
-			daysAfterToday = append(daysAfterToday, index)
-		}
-	}
+// 	// Convert the Habbit's days into indexes
+// 	daysAfterToday, daysBeforeToday := []int{}, []int{}
+// 	for _, day := range h.Days {
+// 		if index := weekdayOrdering[day]; index < todaysIndex {
+// 			daysBeforeToday = append(daysBeforeToday, index)
+// 		} else {
+// 			daysAfterToday = append(daysAfterToday, index)
+// 		}
+// 	}
 
-	weekFromToday := append(daysAfterToday, daysBeforeToday...)
-	if len(weekFromToday) == 1 {
-		dueDates.NextDue = days[weekFromToday[0]]
-		dueDates.NextDueAfterCompleted = days[weekFromToday[0]]
-	} else {
-		dueDates.NextDue = days[weekFromToday[0]]
-		dueDates.NextDueAfterCompleted = days[weekFromToday[1]]
-	}
+// 	weekFromToday := append(daysAfterToday, daysBeforeToday...)
+// 	if len(weekFromToday) == 1 {
+// 		dueDates.NextDue = days[weekFromToday[0]]
+// 		dueDates.NextDueAfterCompleted = days[weekFromToday[0]]
+// 	} else {
+// 		dueDates.NextDue = days[weekFromToday[0]]
+// 		dueDates.NextDueAfterCompleted = days[weekFromToday[1]]
+// 	}
 
-	if dueDates.NextDue == today {
-		dueDates.NextDue = "Today"
-	} else if dueDates.NextDue == tomorrow {
-		dueDates.NextDue = "Tomorrow"
-	}
+// 	if dueDates.NextDue == today {
+// 		dueDates.NextDue = "Today"
+// 	} else if dueDates.NextDue == tomorrow {
+// 		dueDates.NextDue = "Tomorrow"
+// 	}
 
-	if dueDates.NextDueAfterCompleted == tomorrow {
-		dueDates.NextDueAfterCompleted = "Tomorrow"
-	}
+// 	if dueDates.NextDueAfterCompleted == tomorrow {
+// 		dueDates.NextDueAfterCompleted = "Tomorrow"
+// 	}
 
-	dueDates.NextDue = strings.Title(dueDates.NextDue)
-	dueDates.NextDueAfterCompleted = strings.Title(dueDates.NextDueAfterCompleted)
+// 	dueDates.NextDue = strings.Title(dueDates.NextDue)
+// 	dueDates.NextDueAfterCompleted = strings.Title(dueDates.NextDueAfterCompleted)
 
-	h.NextDue = dueDates
-	return h
-}
+// 	h.NextDue = dueDates
+// 	return h
+// }

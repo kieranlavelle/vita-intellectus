@@ -30,6 +30,10 @@ func CreateRoutes() {
 	router.Use(loggingMiddleware)
 
 	router.HandleFunc("/habit", habits.AddHabit(env)).Methods("POST")
+	router.HandleFunc("/habit/{id:[0-9]+}", habits.GetHabit(env)).Methods("GET")
+	router.HandleFunc("/habit/{id:[0-9]+}", habits.CompleteHabit(env)).Methods("PUT")
+
+	router.HandleFunc("/habits", habits.GetHabits(env)).Methods("GET")
 
 	http.Handle("/", router)
 	http.ListenAndServe("0.0.0.0:8004", nil)

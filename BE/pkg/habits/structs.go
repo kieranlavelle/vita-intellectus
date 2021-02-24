@@ -24,7 +24,6 @@ type Habit struct {
 	Name      string   `json:"name"`
 	Days      []string `json:"days"`
 	Tags      []string `json:"tags"`
-	NextDue   DueDates `json:"due_dates"`
 	Completed bool     `json:"completed"`
 }
 
