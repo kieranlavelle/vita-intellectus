@@ -7,11 +7,23 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+func dbInsertNewHabit(db *pgx.Conn, h Habit, uid int) (int, error) {
+	query := `INSERT INTO habits (user_id, name, days, tags)
+		VALUES ($1, $2, $3, $4) RETURNING id
+	`
+
+	id := 0
+	ctx := context.Background()
+	err := db.QueryRow(ctx, query, uid, h.Name, h.Days, h.Tags).Scan(&id)
+
+	return id, err
+}
+
 // DBHabitsByUser returns habbit_id,user_id,name
 func DBHabitsByUser(conn *pgx.Conn, userID int) (pgx.Rows, error) {
 	return conn.Query(
 		context.Background(),
-		"SELECT id, user_id, name, days FROM habits WHERE user_id=$1",
+		"SELECT id, user_id, name, days, tags FROM habits WHERE user_id=$1",
 		userID,
 	)
 }
@@ -73,7 +85,7 @@ func DBDeleteHabit(conn *pgx.Conn, userID int, habitID int) error {
 func dbGetHabit(conn *pgx.Conn, userID int, habitID int) pgx.Row {
 	query := `
 		SELECT
-			id, user_id, name, days
+			id, user_id, name, days, tags
 		FROM
 			habits
 		WHERE
@@ -101,4 +113,36 @@ func dbCompletedHabits(conn *pgx.Conn, userID int, habitID int) (pgx.Rows, error
 		userID, habitID,
 	)
 
+}
+
+func dbInsertHabit(conn *pgx.Conn, userID int, name string, days, tags []string) (int, error) {
+	query := `
+		INSERT INTO
+			habits
+				(user_id, name, days, tags)
+		VALUES
+			($1, $2, $3, $4)
+		RETURNING id
+	`
+
+	id := 0
+	err := conn.QueryRow(context.Background(), query, userID, name, days, tags).Scan(
+		&id,
+	)
+	return id, err
+}
+
+func dbGetPastMonthCompletions(conn *pgx.Conn, userID, habitID int) (pgx.Rows, error) {
+	query := `
+		SELECT 
+			habit_id, time_completed
+		FROM
+			completed_habits
+		WHERE
+			time_completed > current_date - interval '28' day
+		AND
+			habit_id=$1 AND user_id=$2
+	`
+
+	return conn.Query(context.Background(), query, userID, habitID)
 }

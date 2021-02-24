@@ -1,8 +1,21 @@
 package habits
 
 import (
+	"net/http"
 	"time"
+
+	"github.com/jackc/pgx/v4"
+	"github.com/kieranlavelle/vita-intellectus/pkg/users"
 )
+
+type Env struct {
+	DB *pgx.Conn
+}
+
+func (e *Env) getUser(r *http.Request) (users.User, error) {
+	u := r.Header.Get("X-Authenticated-UserId")
+	return users.GetUser(e.DB, u)
+}
 
 // Habit represents a habbit a user wants to set
 type Habit struct {
@@ -10,6 +23,7 @@ type Habit struct {
 	UserID    int      `json:"user_id"`
 	Name      string   `json:"name"`
 	Days      []string `json:"days"`
+	Tags      []string `json:"tags"`
 	NextDue   DueDates `json:"due_dates"`
 	Completed bool     `json:"completed"`
 }

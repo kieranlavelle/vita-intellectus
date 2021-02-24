@@ -13,36 +13,18 @@ type User struct {
 }
 
 // GetUser get's the full user from the database using the username and email
-func GetUser(conn *pgx.Conn, username string) (User, error) {
+func GetUser(db *pgx.Conn, username string) (User, error) {
 	// need to insert the user into the database for this app
-	userID := -1
-	err := conn.QueryRow(
-		context.Background(),
-		"SELECT user_id FROM users where username=$1",
-		username,
-	).Scan(&userID)
-	if err != nil {
-		switch err {
-		case pgx.ErrNoRows:
-			break
-		default:
-			return User{}, err
-		}
-	}
 
-	if userID != -1 {
-		return User{ID: userID, Username: username}, nil
-	}
-
-	err = conn.QueryRow(
-		context.Background(),
-		"insert into users (username) VALUES ($1) RETURNING user_id",
-		username,
-	).Scan(&userID)
+	ctx := context.Background()
+	query := "SELECT user_id FROM users where username=$1"
+	user := User{}
+	err := db.QueryRow(ctx, query, username).Scan(&user.ID)
 
 	if err != nil {
-		return User{}, err
+		query = "insert into users (username) VALUES ($1) RETURNING user_id"
+		err = db.QueryRow(ctx, query, username).Scan(&user.ID)
 	}
 
-	return User{ID: userID, Username: username}, nil
+	return user, err
 }

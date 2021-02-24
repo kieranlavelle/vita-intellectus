@@ -1,7 +1,8 @@
 package habits
 
 import (
-	"context"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,8 +13,65 @@ import (
 	"github.com/kieranlavelle/vita-intellectus/pkg/helpers"
 )
 
+// HealthCheck returns a 200 status
+func HealthCheck(env *Env) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	}
+}
+
 // AddHabit creates a new habit for the user in the database
-func AddHabit(c *gin.Context) {
+func AddHabit(env *Env) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		user, err := env.getUser(r)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "failed to read body", 500)
+			return
+		}
+
+		habit := Habit{}
+		err = json.Unmarshal(body, &habit)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": "invalid request body",
+			})
+			return
+		}
+
+		if len(habit.Days) == 0 {
+			habit.Days = ALL_DAYS
+		}
+
+		id, err := dbInsertNewHabit(env.DB, habit, user.ID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": "please try again later",
+			})
+			return
+		}
+
+		habit.ID = id
+		habit.UserID = user.ID
+		habit = habit.setDueDates()
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(habit)
+	}
+}
+
+// AddHabit2 creates a new habit for the user in the database
+func AddHabit2(c *gin.Context) {
 
 	var habit Habit
 
@@ -46,17 +104,10 @@ func AddHabit(c *gin.Context) {
 
 	// if there are no days set the default to all
 	if len(habit.Days) == 0 {
-		habit.Days = []string{"monday", "tueday", "wednesday", "thursday",
-			"friday", "saturday", "sunday",
-		}
+		habit.Days = ALL_DAYS
 	}
 
-	err = conn.QueryRow(
-		context.Background(),
-		"insert into habits (user_id, name, days) VALUES ($1, $2, $3) RETURNING id",
-		user.ID, habit.Name, habit.Days,
-	).Scan(&habit.ID)
-
+	newHabitID, err := dbInsertHabit(conn, user.ID, habit.Name, habit.Days, habit.Tags)
 	if err != nil {
 		log.Printf("error when creating habit: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -65,6 +116,7 @@ func AddHabit(c *gin.Context) {
 		return
 	}
 
+	habit.ID = newHabitID
 	habit.UserID = user.ID
 	habit = habit.setDueDates()
 	c.JSON(http.StatusOK, habit)
@@ -120,7 +172,8 @@ func GetHabits(c *gin.Context) {
 
 		habit := Habit{}
 
-		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Days)
+		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name,
+			&habit.Days, &habit.Tags)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"detail": "please try again later.",
@@ -200,7 +253,7 @@ func GetHabit(c *gin.Context) {
 	}
 
 	row := dbGetHabit(conn, user.ID, habitID)
-	err = row.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Days)
+	err = row.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Days, &habit.Tags)
 	if err != nil {
 		switch err {
 		case pgx.ErrNoRows:
@@ -411,4 +464,54 @@ func HabitCompletions(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, habitCompletions)
+}
+
+// HabitInfo returns statistics about a given habit
+func HabitInfo(c *gin.Context) {
+	conn, err := helpers.DatabaseConnection(c)
+	if err != nil {
+		log.Printf("Failed to get DB connection: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later.",
+		})
+		return
+	}
+
+	user, err := helpers.RequestUser(c)
+	if err != nil {
+		log.Printf("Failed to get user: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"detail": "please try again later.",
+		})
+		return
+	}
+
+	habitID, err := strconv.Atoi(c.Param("habitID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"detail": "invalid habit id",
+		})
+		return
+	}
+
+	rows, err := dbGetPastMonthCompletions(conn, user.ID, habitID)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"detail": "please specify a habit you own",
+			})
+			return
+		default:
+			log.Printf("error when getting habit completions: %v\n", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "please try again later.",
+			})
+			return
+		}
+	}
+
+	for rows.Next() {
+		//
+	}
 }
