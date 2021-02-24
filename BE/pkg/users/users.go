@@ -18,7 +18,7 @@ func GetUser(db *pgx.Conn, username string) (User, error) {
 
 	ctx := context.Background()
 	query := "SELECT user_id FROM users where username=$1"
-	user := User{}
+	user := User{Username: username}
 	err := db.QueryRow(ctx, query, username).Scan(&user.ID)
 
 	if err != nil {
