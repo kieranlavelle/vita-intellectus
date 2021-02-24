@@ -93,6 +93,12 @@ func dbCheckHabitIsOwned(conn *pgx.Conn, uid, hid int) (bool, error) {
 	return owned, err
 }
 
+func dbGetHabitCompletions(conn *pgx.Conn, hid int) (pgx.Rows, error) {
+	query := `SELECT habit_id, time_completed FROM habit_completions
+		WHERE habit_id=$1`
+	return conn.Query(context.Background(), query, hid)
+}
+
 // DBHabitsByUser returns habbit_id,user_id,name
 func DBHabitsByUser(conn *pgx.Conn, userID int) (pgx.Rows, error) {
 	return conn.Query(

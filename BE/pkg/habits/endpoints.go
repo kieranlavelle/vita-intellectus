@@ -231,57 +231,47 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 	}
 }
 
-// // UpdateHabit changes the variable properties of a habbit
-// func UpdateHabit(c *gin.Context) {
+// HabitCompletions returns all completions for a given habbit
+func HabitCompletions(env *Env) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-// 	habit := Habit{}
-// 	err := c.ShouldBindJSON(&habit)
-// 	if err != nil {
-// 		log.Printf("Error parsing body %v\n", err)
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"detail": "expected valid habit in body.",
-// 		})
-// 		return
-// 	}
+		user, err := env.getUser(r)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
 
-// 	conn, err := helpers.DatabaseConnection(c)
-// 	if err != nil {
-// 		log.Printf("Failed to get DB connection: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"detail": "please try again later",
-// 		})
-// 		return
-// 	}
+		// don't need to check the error as it is done
+		// by the router.
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		owned, err := dbCheckHabitIsOwned(env.DB, user.ID, id)
+		if owned != true {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": "please specify a habit you own",
+			})
+			return
+		}
 
-// 	user, err := helpers.RequestUser(c)
-// 	if err != nil {
-// 		log.Printf("Failed to get user: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"detail": "please try again later",
-// 		})
-// 		return
-// 	}
+		rows, err := dbGetHabitCompletions(env.DB, id)
+		if err != nil {
+			switch err {
+			case pgx.ErrNoRows:
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(map[string][]string{
+					"completions": {},
+				})
+			}
+		}
 
-// 	err = DBUpdateHabit(conn, user.ID, habit)
-// 	if err != nil {
-// 		switch err.(type) {
-// 		case *HabitNotFoundError:
-// 			c.JSON(http.StatusNotFound, gin.H{
-// 				"detail": "please pass a valid habit_id for a habit you own.",
-// 			})
-// 		default:
-// 			c.JSON(http.StatusInternalServerError, gin.H{
-// 				"detail": "error updating habit. Please try again.",
-// 			})
-// 		}
-// 		return
-// 	}
+		for rows.Next() {
+			...
+		}
 
-// 	habit = habit.setDueDates()
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"habit": habit,
-// 	})
-// }
+	}
+}
 
 // // HabitCompletions returns all completions for a given habbit
 // func HabitCompletions(c *gin.Context) {
