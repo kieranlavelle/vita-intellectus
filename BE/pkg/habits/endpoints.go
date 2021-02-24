@@ -154,7 +154,7 @@ func GetHabit(env *Env) http.HandlerFunc {
 func CompleteHabit(env *Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		_, err := env.getUser(r)
+		user, err := env.getUser(r)
 		if err != nil {
 			w.WriteHeader(500)
 			return
@@ -163,6 +163,16 @@ func CompleteHabit(env *Env) http.HandlerFunc {
 		// don't need to check the error as it is done
 		// by the router.
 		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		owned, err := dbCheckHabitIsOwned(env.DB, user.ID, id)
+		if owned != true {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": "please specify a habit you own",
+			})
+			return
+		}
+
 		err = dbCompleteHabit(env.DB, id)
 		if err != nil {
 			w.Header().Add("Content-Type", "application/json")
@@ -192,6 +202,16 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 		// don't need to check the error as it is done
 		// by the router.
 		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		owned, err := dbCheckHabitIsOwned(env.DB, user.ID, id)
+		if owned != true {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": "please specify a habit you own",
+			})
+			return
+		}
+
 		err = dbDeleteHabit(env.DB, user.ID, id)
 		if err != nil {
 			w.Header().Set("Content-Type", "application/json")
@@ -210,49 +230,6 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 
 	}
 }
-
-// // DeleteHabit removes the habbit specified
-// func DeleteHabit(c *gin.Context) {
-
-// 	// form the DB connection
-// 	conn, err := helpers.DatabaseConnection(c)
-// 	if err != nil {
-// 		log.Printf("failed to get DB connection: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"detail": "please try again later.",
-// 		})
-// 		return
-// 	}
-
-// 	// get the user making the request
-// 	user, err := helpers.RequestUser(c)
-// 	if err != nil {
-// 		log.Printf("failed to get user: %v\n", err)
-// 		c.JSON(http.StatusInternalServerError, gin.H{
-// 			"detail": "please try again later.",
-// 		})
-// 		return
-// 	}
-
-// 	habitID, err := strconv.Atoi(c.Param("habitID"))
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{
-// 			"detail": "invalid habit id",
-// 		})
-// 		return
-// 	}
-
-// 	//Delete habit
-// 	err = DBDeleteHabit(conn, user.ID, habitID)
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{
-// 			"detail": "please pass a habit_id for a habit you own",
-// 		})
-// 		return
-// 	}
-
-// 	c.String(http.StatusOK, "success")
-// }
 
 // // UpdateHabit changes the variable properties of a habbit
 // func UpdateHabit(c *gin.Context) {

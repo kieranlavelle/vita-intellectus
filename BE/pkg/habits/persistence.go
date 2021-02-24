@@ -86,6 +86,13 @@ func dbDeleteHabit(conn *pgx.Conn, uid, hid int) error {
 	return err
 }
 
+func dbCheckHabitIsOwned(conn *pgx.Conn, uid, hid int) (bool, error) {
+	owned := false
+	query := `SELECT COUNT(*) > 0 FROM habits WHERE id=$1 AND user_id=$2`
+	err := conn.QueryRow(context.Background(), query, hid, uid).Scan(&owned)
+	return owned, err
+}
+
 // DBHabitsByUser returns habbit_id,user_id,name
 func DBHabitsByUser(conn *pgx.Conn, userID int) (pgx.Rows, error) {
 	return conn.Query(
