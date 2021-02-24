@@ -266,10 +266,20 @@ func HabitCompletions(env *Env) http.HandlerFunc {
 			}
 		}
 
-		for rows.Next() {
-			...
+		completions := HabitCompletionsResponse{
+			Completions: []HabitCompletedRow{},
 		}
 
+		for rows.Next() {
+			c := HabitCompletedRow{}
+			rows.Scan(&c.HabitID, &c.Time)
+
+			completions.Completions = append(completions.Completions, c)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(completions)
 	}
 }
 

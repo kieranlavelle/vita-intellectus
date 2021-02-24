@@ -32,6 +32,7 @@ func CreateRoutes() {
 	router.HandleFunc("/habit", habits.AddHabit(env)).Methods("POST")
 	router.HandleFunc("/habit/{id:[0-9]+}", habits.GetHabit(env)).Methods("GET")
 	router.HandleFunc("/habit/{id:[0-9]+}", habits.CompleteHabit(env)).Methods("PUT")
+	router.HandleFunc("/habit/{id:[0-9]+}/completions", habits.HabitCompletions(env)).Methods("GET")
 
 	router.HandleFunc("/habits", habits.GetHabits(env)).Methods("GET")
 
