@@ -1,7 +1,6 @@
 package habit
 
 import (
-	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -189,29 +188,13 @@ func (h *Habit) Info(c *pgx.Conn) (HabitInfo, error) {
 		return HabitInfo{}, err
 	}
 
-	// Gives us all the dates we completed the habit
-	// when we we're required to ordered from newest
-	// to oldest
-	completionTimes := []time.Time{}
-	for _, completion := range completions.Completions {
-		weekday := strings.ToLower(completion.Time.Weekday().String())
-		if stringContains(h.Days, weekday) {
-			completionTimes = append(completionTimes, completion.Time)
-		}
-	}
+	hInfo.Streak = calculateStreak(h, completions)
 
-	allDaysBetween := daysBetween(completionTimes[len(completionTimes)-1], time.Now(), h.Days)
+	// consecutive completions
 
-	for i, expected := range allDaysBetween {
+	// percent this month
 
-		if i >= len(completionTimes) {
-			break
-		} else if !dateEqual(completionTimes[i], expected) {
-			break
-		}
-
-		hInfo.Streak++
-	}
+	// percent overall
 
 	return hInfo, err
 
