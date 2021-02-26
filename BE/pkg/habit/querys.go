@@ -87,6 +87,8 @@ func habitCompletions(h *Habit, c *pgx.Conn) (pgx.Rows, error) {
 			completed_habits
 		WHERE
 			habit_id=$1
+		ORDER BY
+			time_completed DESC
 	`
 	return c.Query(context.Background(), query, h.ID)
 }

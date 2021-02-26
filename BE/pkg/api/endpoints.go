@@ -344,3 +344,38 @@ func Habits(env *Env) http.HandlerFunc {
 		})
 	}
 }
+
+// HabitInfo returns all of the habits for a user
+func HabitInfo(env *Env) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := env.getUser(r)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		// don't need to check the error as it is done
+		// by the router.
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		habit, err := h.Load(id, user.ID, env.DB)
+		if err != nil {
+			switch err.(type) {
+			case *h.Error:
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]string{
+					"detail": err.Error(),
+				})
+			default:
+				env.internalServerError(w)
+			}
+			return
+		}
+
+		info, err := habit.Info(env.DB)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(info)
+	}
+}

@@ -1,6 +1,7 @@
 package habit
 
 import (
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -16,6 +17,26 @@ var allDays = []string{
 	"sunday",
 }
 
+var indexToDay = map[int]string{
+	0: "monday",
+	1: "tuesday",
+	2: "wednesday",
+	3: "thursday",
+	4: "friday",
+	5: "saturday",
+	6: "sunday",
+}
+
+var dayToIndex = map[string]int{
+	"monday":    0,
+	"tuesday":   1,
+	"wednesday": 2,
+	"thursday":  3,
+	"friday":    4,
+	"saturday":  5,
+	"sunday":    6,
+}
+
 // Habit represents a habbit a user wants to set
 type Habit struct {
 	ID        int      `json:"id"`
@@ -24,6 +45,10 @@ type Habit struct {
 	Days      []string `json:"days"`
 	Tags      []string `json:"tags"`
 	Completed bool     `json:"completed"`
+}
+
+type HabitInfo struct {
+	Streak int `json:"streak"`
 }
 
 type HabitCompletions struct {
@@ -152,4 +177,42 @@ func (h *Habit) Completions(c *pgx.Conn) (HabitCompletions, error) {
 	}
 
 	return hCompletions, err
+}
+
+// Info gets information about the habit such
+// as the number of times it has been completed in a row
+func (h *Habit) Info(c *pgx.Conn) (HabitInfo, error) {
+
+	hInfo := HabitInfo{}
+	completions, err := h.Completions(c)
+	if err != nil {
+		return HabitInfo{}, err
+	}
+
+	// Gives us all the dates we completed the habit
+	// when we we're required to ordered from newest
+	// to oldest
+	completionTimes := []time.Time{}
+	for _, completion := range completions.Completions {
+		weekday := strings.ToLower(completion.Time.Weekday().String())
+		if stringContains(h.Days, weekday) {
+			completionTimes = append(completionTimes, completion.Time)
+		}
+	}
+
+	allDaysBetween := daysBetween(completionTimes[len(completionTimes)-1], time.Now(), h.Days)
+
+	for i, expected := range allDaysBetween {
+
+		if i >= len(completionTimes) {
+			break
+		} else if !dateEqual(completionTimes[i], expected) {
+			break
+		}
+
+		hInfo.Streak++
+	}
+
+	return hInfo, err
+
 }
