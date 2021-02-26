@@ -47,7 +47,10 @@ type Habit struct {
 }
 
 type HabitInfo struct {
-	Streak int `json:"streak"`
+	ID                int     `json:"habit_id"`
+	Streak            int     `json:"streak"`
+	Consecutive       int     `json:"consecutive"`
+	CompletionPercent float32 `json:"28_day_percent"`
 }
 
 type HabitCompletions struct {
@@ -182,7 +185,7 @@ func (h *Habit) Completions(c *pgx.Conn) (HabitCompletions, error) {
 // as the number of times it has been completed in a row
 func (h *Habit) Info(c *pgx.Conn) (HabitInfo, error) {
 
-	hInfo := HabitInfo{}
+	hInfo := HabitInfo{ID: h.ID}
 	completions, err := h.Completions(c)
 	if err != nil {
 		return HabitInfo{}, err
@@ -191,10 +194,10 @@ func (h *Habit) Info(c *pgx.Conn) (HabitInfo, error) {
 	hInfo.Streak = calculateStreak(h, completions)
 
 	// consecutive completions
+	hInfo.Consecutive = consecutiveCompletions(h, completions)
 
 	// percent this month
-
-	// percent overall
+	hInfo.CompletionPercent = completionPercentage(h, completions)
 
 	return hInfo, err
 

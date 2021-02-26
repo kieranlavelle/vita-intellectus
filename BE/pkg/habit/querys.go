@@ -114,3 +114,18 @@ func userHabits(uid int, c *pgx.Conn) (pgx.Rows, error) {
 
 	return c.Query(context.Background(), query, uid)
 }
+
+func rolling28dayCompleted(hid int, c *pgx.Conn) (pgx.Rows, error) {
+	query := `
+		SELECT
+			time_completed
+		FROM
+			completed_habits
+		WHERE
+			time_completed > current_date - interval '28' day
+		AND
+			habit_id=$1
+	`
+
+	return c.Query(context.Background(), query, hid)
+}

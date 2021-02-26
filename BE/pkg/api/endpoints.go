@@ -376,6 +376,8 @@ func HabitInfo(env *Env) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(info)
+		json.NewEncoder(w).Encode(map[string]h.HabitInfo{
+			"info": info,
+		})
 	}
 }
