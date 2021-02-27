@@ -56,7 +56,5 @@ func CreateRoutes() {
 
 	router.HandleFunc("/habits", Habits(env)).Methods(methods("GET")...)
 
-	http.Handle("/", router)
-
-	log.Fatal(http.ListenAndServe(":8004", nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8004", router))
 }
