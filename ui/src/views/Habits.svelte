@@ -10,11 +10,7 @@
     onMount(() => {
         API.get('/habits', getHeaders())
            .then(response => {
-               habits = [
-                   ...response.data.due,
-                   ...response.data.completed,
-                   ...response.data.not_due
-               ];
+               habits = response.data.habits;
         });
     })
 </script>

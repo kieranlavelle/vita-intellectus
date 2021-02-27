@@ -1,23 +1,34 @@
 <script>
-import { onMount } from "svelte";
+// import { getHeaders } from "../http";
 
-    
+    import { API, getHeaders } from '../http'
+
     export let id;
     export let name;
     export let days;
     export let completed;
     export let user_id;
-    export let due_dates;
+    export let tags;
 
-    $: nextDue = completed ? due_dates.next_due : due_dates.next_due_on_completed;
-    $: state = 'Not Due';
 
-    if (completed){
-        state = 'Completed';
-    } else if (nextDue == 'Today') {
-        state = 'Due';
-    }
+    $: info = {
+        streak: 0
+    };
+    API.get(`/habit/${id}/info`, getHeaders())
+       .then(response => {
+           console.log(response);
+           info = response.data.info;
+       })
 
+
+    // $: nextDue = completed ? due_dates.next_due : due_dates.next_due_on_completed;
+    // $: state = 'Not Due';
+
+    // if (completed){
+    //     state = 'Completed';
+    // } else if (nextDue == 'Today') {
+    //     state = 'Due';
+    // }
 </script>
 
 <div class="rounded shadow-xl hover:shadow-2xl border border-gray-300">
@@ -25,15 +36,18 @@ import { onMount } from "svelte";
         <span class="font-bold py-1">{name}</span>
         <span class="text-sm py-1">
             Streak: <span class="text-green-800 font-bold">
-                +1
+                {info.streak}
             </span>
         </span>
-        <span class="text-sm py-1">
-            Tags:
-            <span class="bg-indigo-400 px-2 rounded-3xl text-white">
-                {state}
+        {#if tags.length > 0}
+            <span class="pb-1">Tags:
+                {#each tags as tag}
+                    <span class="bg-indigo-400 px-2 rounded-3xl text-white">
+                        {tag}
+                    </span>
+                {/each}
             </span>
-        </span>
+        {/if}
         <span class="text-right">
             <button class="border-2 border-green-600 border-opacity-50 rounded-md p-1 hover:border-3 hover:border-green-500 hover:border-opacity-100">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-4 w-4 text-green-600">
