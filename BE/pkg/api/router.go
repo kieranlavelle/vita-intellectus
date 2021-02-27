@@ -28,19 +28,31 @@ func CreateRoutes() {
 	}
 	defer pool.Close()
 
+	// setup out logger
+	log.SetFormatter(&log.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	})
+	log.SetOutput(os.Stdout)
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.DebugLevel)
+
 	env := &Env{DB: pool}
 	router := mux.NewRouter()
 
 	router.Use(loggingMiddleware)
 	router.Use(corsMiddleware)
 
-	router.HandleFunc("/habit", AddHabit(env)).Methods("POST")
-	router.HandleFunc("/habit/{id:[0-9]+}", DeleteHabit(env)).Methods("DELETE")
-	router.HandleFunc("/habit/{id:[0-9]+}", GetHabit(env)).Methods("GET")
-	router.HandleFunc("/habit/{id:[0-9]+}", Update(env)).Methods("PUT")
-	router.HandleFunc("/habit/{id:[0-9]+}/complete", Complete(env)).Methods("PUT")
-	router.HandleFunc("/habit/{id:[0-9]+}/info", HabitInfo(env)).Methods("GET", "OPTIONS")
-	router.HandleFunc("/habit/{id:[0-9]+}/completions", Completions(env)).Methods("GET")
+	router.HandleFunc("/health", HealthCheck(env)).Methods(methods("GET")...)
+
+	router.HandleFunc("/habit", AddHabit(env)).Methods(methods("POST")...)
+	router.HandleFunc("/habit/{id:[0-9]+}", DeleteHabit(env)).Methods(methods("DELETE")...)
+	router.HandleFunc("/habit/{id:[0-9]+}", GetHabit(env)).Methods(methods("GET")...)
+	router.HandleFunc("/habit/{id:[0-9]+}", Update(env)).Methods(methods("PUT")...)
+	router.HandleFunc("/habit/{id:[0-9]+}/complete", Complete(env)).Methods(methods("PUT")...)
+	router.HandleFunc("/habit/{id:[0-9]+}/info", HabitInfo(env)).Methods(methods("GET")...)
+	router.HandleFunc("/habit/{id:[0-9]+}/completions", Completions(env)).Methods(methods("GET")...)
 
 	router.HandleFunc("/habits", Habits(env)).Methods(methods("GET")...)
 

@@ -23,7 +23,7 @@ func AddHabit(env *Env) http.HandlerFunc {
 
 		user, err := env.getUser(r)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -46,7 +46,7 @@ func AddHabit(env *Env) http.HandlerFunc {
 
 		err = habit.Update(env.DB)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -63,7 +63,7 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 
 		user, err := env.getUser(r)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -80,7 +80,7 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -89,7 +89,7 @@ func DeleteHabit(env *Env) http.HandlerFunc {
 		// so any error is a server error
 		err = habit.Delete(env.DB)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -108,7 +108,7 @@ func GetHabit(env *Env) http.HandlerFunc {
 
 		user, err := env.getUser(r)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -125,7 +125,7 @@ func GetHabit(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -161,14 +161,14 @@ func Update(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
 
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -194,7 +194,7 @@ func Update(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -230,7 +230,7 @@ func Complete(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -247,7 +247,7 @@ func Complete(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -283,7 +283,7 @@ func Completions(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -300,7 +300,7 @@ func Completions(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -316,7 +316,7 @@ func Habits(env *Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, err := env.getUser(r)
 		if err != nil {
-			env.internalServerError(w, err)
+			env.internalServerError(w, r, err)
 			return
 		}
 
@@ -332,7 +332,7 @@ func Habits(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}
@@ -367,7 +367,7 @@ func HabitInfo(env *Env) http.HandlerFunc {
 					"detail": err.Error(),
 				})
 			default:
-				env.internalServerError(w, err)
+				env.internalServerError(w, r, err)
 			}
 			return
 		}

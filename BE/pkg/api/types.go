@@ -20,9 +20,11 @@ func (e *Env) getUser(r *http.Request) (users.User, error) {
 	return users.GetUser(e.DB, u)
 }
 
-func (e *Env) internalServerError(w http.ResponseWriter, err error) {
+func (e *Env) internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 
-	log.Fatalf("error connecting to DB: %v\n", err)
+	log.WithField("user", r.Header.Get("X-Authenticated-UserId")).Errorf(
+		"internal server error: %v", err,
+	)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusInternalServerError)
 	json.NewEncoder(w).Encode(map[string]string{
