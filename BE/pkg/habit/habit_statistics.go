@@ -19,6 +19,10 @@ func calculateStreak(h *Habit, completions HabitCompletions) int {
 		}
 	}
 
+	if len(completionDays) == 0 {
+		return 0
+	}
+
 	expectedDays := daysBetween(completionDays[len(completionDays)-1], time.Now(), h.Days)
 
 	for i, expected := range expectedDays {
