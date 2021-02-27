@@ -5,9 +5,10 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-func getHabit(h *Habit, c *pgx.Conn) error {
+func getHabit(h *Habit, c *pgxpool.Pool) error {
 	query := `
 		SELECT
 			h.user_id,
@@ -30,7 +31,7 @@ func getHabit(h *Habit, c *pgx.Conn) error {
 	)
 }
 
-func updateHabit(h *Habit, c *pgx.Conn) error {
+func updateHabit(h *Habit, c *pgxpool.Pool) error {
 	query := `
 		UPDATE
 			habits
@@ -43,7 +44,7 @@ func updateHabit(h *Habit, c *pgx.Conn) error {
 	return err
 }
 
-func insertHabit(h *Habit, c *pgx.Conn) error {
+func insertHabit(h *Habit, c *pgxpool.Pool) error {
 	query := `
 		INSERT INTO
 			habits (user_id, name, tags, days)
@@ -57,7 +58,7 @@ func insertHabit(h *Habit, c *pgx.Conn) error {
 	return err
 }
 
-func deleteHabit(h *Habit, c *pgx.Conn) error {
+func deleteHabit(h *Habit, c *pgxpool.Pool) error {
 	query := `
 		DELETE FROM
 			habits
@@ -68,7 +69,7 @@ func deleteHabit(h *Habit, c *pgx.Conn) error {
 	return err
 }
 
-func completeHabit(h *Habit, c *pgx.Conn) error {
+func completeHabit(h *Habit, c *pgxpool.Pool) error {
 	query := `
 		INSERT INTO
 			completed_habits (habit_id, time_completed)
@@ -79,7 +80,7 @@ func completeHabit(h *Habit, c *pgx.Conn) error {
 	return err
 }
 
-func habitCompletions(h *Habit, c *pgx.Conn) (pgx.Rows, error) {
+func habitCompletions(h *Habit, c *pgxpool.Pool) (pgx.Rows, error) {
 	query := `
 		SELECT
 			habit_id, time_completed
@@ -93,7 +94,7 @@ func habitCompletions(h *Habit, c *pgx.Conn) (pgx.Rows, error) {
 	return c.Query(context.Background(), query, h.ID)
 }
 
-func userHabits(uid int, c *pgx.Conn) (pgx.Rows, error) {
+func userHabits(uid int, c *pgxpool.Pool) (pgx.Rows, error) {
 	query := `
 		SELECT
 			DISTINCT h.id,
@@ -115,7 +116,7 @@ func userHabits(uid int, c *pgx.Conn) (pgx.Rows, error) {
 	return c.Query(context.Background(), query, uid)
 }
 
-func rolling28dayCompleted(hid int, c *pgx.Conn) (pgx.Rows, error) {
+func rolling28dayCompleted(hid int, c *pgxpool.Pool) (pgx.Rows, error) {
 	query := `
 		SELECT
 			time_completed

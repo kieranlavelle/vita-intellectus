@@ -1,2 +1,4 @@
 /ui/node_modules/*
 /ui/public/build/*
+/BE/.vscode/*
+/BE/cmd/__debug_bin

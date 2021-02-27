@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 var allDays = []string{
@@ -64,7 +65,7 @@ type HabitCompletion struct {
 
 // Load returns a habit corresponding to the
 // habit id and user id passed if one is found.
-func Load(hid, uid int, c *pgx.Conn) (Habit, error) {
+func Load(hid, uid int, c *pgxpool.Pool) (Habit, error) {
 	h := Habit{ID: hid, UID: uid}
 	err := getHabit(&h, c)
 	switch err {
@@ -81,9 +82,10 @@ func New(uid int) Habit {
 }
 
 // Habits returns all of the habits for the caller
-func Habits(uid int, c *pgx.Conn) ([]Habit, error) {
+func Habits(uid int, c *pgxpool.Pool) ([]Habit, error) {
 
 	habitRows, err := userHabits(uid, c)
+	defer habitRows.Close()
 	if err != nil {
 		return []Habit{}, err
 	}
@@ -113,7 +115,7 @@ func (h *Habit) updateable(h1 Habit) bool {
 
 // Update inserts a habit into the database or
 // updates it if it already exists
-func (h *Habit) Update(c *pgx.Conn) error {
+func (h *Habit) Update(c *pgxpool.Pool) error {
 
 	// see if this habit exists
 	exists := true
@@ -141,7 +143,7 @@ func (h *Habit) Update(c *pgx.Conn) error {
 // Delete removes a habit from the database
 // doesnt check ownership as this is done in
 // the Load function
-func (h *Habit) Delete(c *pgx.Conn) error {
+func (h *Habit) Delete(c *pgxpool.Pool) error {
 	err := deleteHabit(h, c)
 	return err
 }
@@ -149,7 +151,7 @@ func (h *Habit) Delete(c *pgx.Conn) error {
 // Complete add's an entry into the habit_completions
 // table for a given habit if there isnt one already
 // otherwise it errors
-func (h *Habit) Complete(c *pgx.Conn) error {
+func (h *Habit) Complete(c *pgxpool.Pool) error {
 	if h.Completed {
 		return &Error{"can only complete a habit once a day"}
 	}
@@ -159,7 +161,7 @@ func (h *Habit) Complete(c *pgx.Conn) error {
 
 // Completions get's all of the times this habit
 // has been completed
-func (h *Habit) Completions(c *pgx.Conn) (HabitCompletions, error) {
+func (h *Habit) Completions(c *pgxpool.Pool) (HabitCompletions, error) {
 
 	completions, err := habitCompletions(h, c)
 	defer completions.Close()
@@ -183,7 +185,7 @@ func (h *Habit) Completions(c *pgx.Conn) (HabitCompletions, error) {
 
 // Info gets information about the habit such
 // as the number of times it has been completed in a row
-func (h *Habit) Info(c *pgx.Conn) (HabitInfo, error) {
+func (h *Habit) Info(c *pgxpool.Pool) (HabitInfo, error) {
 
 	hInfo := HabitInfo{ID: h.ID}
 	completions, err := h.Completions(c)

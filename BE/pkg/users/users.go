@@ -3,7 +3,7 @@ package users
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // User represents a user in the database
@@ -13,7 +13,7 @@ type User struct {
 }
 
 // GetUser get's the full user from the database using the username and email
-func GetUser(db *pgx.Conn, username string) (User, error) {
+func GetUser(db *pgxpool.Pool, username string) (User, error) {
 	// need to insert the user into the database for this app
 
 	ctx := context.Background()
