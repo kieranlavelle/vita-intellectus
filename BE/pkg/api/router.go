@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v4/pgxpool"
 	log "github.com/sirupsen/logrus"
@@ -56,5 +57,7 @@ func CreateRoutes() {
 
 	router.HandleFunc("/habits", Habits(env)).Methods(methods("GET")...)
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:8004", router))
+	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
+
+	log.Fatal(http.ListenAndServe("0.0.0.0:8004", loggedRouter))
 }
