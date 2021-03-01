@@ -97,7 +97,8 @@ func habitCompletions(h *Habit, c *pgxpool.Pool) (pgx.Rows, error) {
 func userHabits(uid int, c *pgxpool.Pool) (pgx.Rows, error) {
 	query := `
 		SELECT
-			DISTINCT h.id,
+			DISTINCT ON (h.id)
+			h.id,
 			h.user_id,
 			h.name,
 			h.days,
@@ -111,6 +112,7 @@ func userHabits(uid int, c *pgxpool.Pool) (pgx.Rows, error) {
 			JOIN completed_habits c ON h.id = c.habit_id
 		WHERE
 			h.user_id=$1
+		ORDER BY h.id, c.time_completed DESC
 	`
 
 	return c.Query(context.Background(), query, uid)
