@@ -1,23 +1,15 @@
 import axios from 'axios';
 
 const AUTH = axios.create({
-    baseURL: 'https://auth.node404.com'
-})
+    baseURL: 'https://auth.node404.com/',
+    timeout: 1000,
+    headers: {}
+});
 
 const API = axios.create({
-    baseURL: 'https://gateway.node404.com/vita'
-})
+    baseURL: 'https://gateway.node404.com/vita/',
+    timeout: 1000,
+    headers: {}
+});
 
-function getHeaders() {
-    return {
-        headers: {
-            Authorization: window.localStorage.getItem('token')
-        }
-    }
-}
-
-export {
-    AUTH,
-    API,
-    getHeaders
-}
+export {API, AUTH}
