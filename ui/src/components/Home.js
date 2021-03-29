@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useHistory } from "react-router-dom";
 
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,25 +25,41 @@ const useStyles = makeStyles((theme) => ({
 function Home() {
   const [token, setToken] = usePersistedState('token', '');
   const classes = useStyles();
+  const history = useHistory();
 
   const [habits, setHabits] = useState([]);
 
 
   useEffect(() => {
     getHabits(token).then(response => {
-      response.data.habits.forEach(function (habit, index){
-        setHabits([...habits, habit])
-      })
+      setHabits(response.data.habits);
     }).catch(error => {
-      console.log(error);
+      if (error.response.status === 401) {
+        setToken('');
+        history.push('/login');
+      }
     })
   }, [])
+
+  const onDeleteHabit = (id) => {
+    const newHabits = [];
+    habits.forEach((val, index) => {
+      if (val.id !== id) {
+        newHabits.push(val);
+      }
+    })
+
+    setHabits(newHabits);
+  }
   
+  const onNewHabit = (habit) => {
+    setHabits([...habits, habit]);
+  }
 
   return (
     <div className={classes.root}>
       <Nav />
-      <HomeToolbar token={token}/>
+      <HomeToolbar token={token} onNewHabit={onNewHabit}/>
       <Grid
         container
         direction="row"
@@ -50,7 +67,14 @@ function Home() {
         alignItems="flex-start"
         className={classes.habitContainer}
       >
-        {habits.map(habit => <HabitCard key={habit.name} {...habit} />)}
+        {habits.map(habit => 
+          <HabitCard
+            key={habit.id}
+            token={token}
+            onDeleteHabit={onDeleteHabit}
+            {...habit}
+          />
+        )}
       </Grid>
     </div>
   )

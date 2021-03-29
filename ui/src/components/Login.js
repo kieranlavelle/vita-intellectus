@@ -56,7 +56,6 @@ function Login() {
 
     AUTH.post('login', formData)
         .then(response => {
-          // set token = response.data.access_token
           setToken(response.data.access_token);
           history.push('/home')
         })

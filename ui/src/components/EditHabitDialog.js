@@ -10,11 +10,10 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 
 import TextField from '@material-ui/core/TextField';
 
-import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
 
 import DayPicker from './DayPicker'
-import { createHabit } from '../endpoints';
+import { editHabit } from '../endpoints';
 
 const useStyles = makeStyles((theme) => ({
   chips: {
@@ -29,44 +28,40 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function NewHabitDialog(props){
+function EditHabitDialog(props){
 
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
-  const [days, setDays] = useState([]);
-  const [habitName, setHabitName] = useState("");
+  const {open, setOpen, currentDays, name, onEdit} = props;
 
-  const hableSubmit = () => {
+  const [days, setDays] = useState(currentDays ? currentDays : []);
+  const [habitName, setHabitName] = useState(name);
+
+  const onSubmit = () => {
 
     const habit = {
-      name: habitName,
-      days: days,
+      name: habitName
     }
-    createHabit(props.token, habit)
+    editHabit(props.token, habit, props.id)
       .then(response => {
-        props.onClose(response.data);
+        onEdit(habit);
         setOpen(false);
       })
       .catch(error => {
         console.log(error);
-        alert('failed to create habit')
+        alert('failed to edit habit')
       })
   }
 
   return (
     <div>
-      <Button onClick={() => setOpen(true)}>
-        New Habit <AddIcon />
-      </Button>
       <Dialog
-        onClose={() => {setOpen(false)}}
         open={open}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">New Habit</DialogTitle>
+        <DialogTitle id="form-dialog-title">Edit Habit</DialogTitle>
         <DialogContent className={classes.dialogContent}>
           <DialogContentText>
-            Use the form below to add a new habit to your schedule.
+            Use the form below to alter a pre-existing habit.
           </DialogContentText>
             <TextField
               autoFocus
@@ -74,17 +69,18 @@ function NewHabitDialog(props){
               id="name"
               type="text"
               label="name"
+              value={habitName}
               onChange={(e) => setHabitName(e.target.value)}
               fullWidth
             />
-            <DayPicker updateDays={setDays}/>
+            <DayPicker disabled={true} updateDays={setDays} selectedDays={currentDays}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => {setOpen(false)}} color="secondary" variant="outlined">
             Close
           </Button>
-          <Button onClick={hableSubmit} color="primary" variant="outlined">
-            Create
+          <Button onClick={onSubmit} color="primary" variant="outlined">
+            Edit
           </Button>
         </DialogActions>
       </Dialog>
@@ -92,9 +88,9 @@ function NewHabitDialog(props){
   )
 }
 
-NewHabitDialog.propTypes = {
-  onClose: PropTypes.func.isRequired,
+EditHabitDialog.propTypes = {
+  onEdit: PropTypes.func.isRequired,
 };
 
-export default NewHabitDialog;
+export default EditHabitDialog;
 

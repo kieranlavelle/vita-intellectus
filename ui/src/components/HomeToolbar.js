@@ -14,7 +14,7 @@ function HomeToolbar(props){
   const classes = useStyles();
 
   const onClose = (value) => {
-    console.log(value);
+    props.onNewHabit(value);
   }
 
   return (

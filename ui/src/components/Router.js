@@ -13,7 +13,7 @@ import Register from './Register'
 
 function ProtectedRoute(props){
     let authorized = (
-        <Route path={props.path}>
+        <Route {...props}>
             {props.children}
         </Route>
     )
@@ -33,6 +33,9 @@ function Router() {
         <div>
             <BrowserRouter>
                 <Switch>
+                    <ProtectedRoute path="/" exact token={token}>
+                        <Home />
+                    </ProtectedRoute>
                     <ProtectedRoute path="/home" token={token}>
                         <Home />
                     </ProtectedRoute>

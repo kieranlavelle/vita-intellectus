@@ -1,13 +1,11 @@
 import { API } from './http'
 
-function completeHabit(habitID){
-  API.put(`habit/${habitID}/complete`)
-    .then(response => {
-      return response;
-    })
-    .catch(error => {
-      return error.response;
-    })
+function completeHabit(token, habitID){
+  return API.put(`habit/${habitID}/complete`, {}, {
+    headers: {
+      Authorization: token,
+    }
+  })
 }
 
 function getHabits(token){
@@ -26,8 +24,26 @@ function createHabit(token, body){
   })
 }
 
+function editHabit(token, body, habitID){
+  return API.put(`habit/${habitID}`, body, {
+    headers: {
+      Authorization: token,
+    }
+  })
+}
+
+function deleteHabit(token, habitID) {
+  return API.delete(`habit/${habitID}`, {
+    headers: {
+      Authorization: token,
+    }
+  })
+}
+
 export {
   completeHabit,
   getHabits,
-  createHabit
+  createHabit,
+  editHabit,
+  deleteHabit
 }

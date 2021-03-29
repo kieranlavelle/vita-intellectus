@@ -1,25 +1,3 @@
-// import { useState } from 'react';
-
-// function DayPicker(){
-
-//     const [days, setDays] = useState([]);
-//     const daysOfTheWeek = [
-//         {key: 'monday', value: 'Monday'},
-//         {key: 'tuesday', value: 'Tuesday'},
-//         {key: 'wednesday', value: 'Wednesday'},
-//         {key: 'thursday', value: 'Thursday'},
-//         {key: 'friday', value: 'Friday'},
-//         {key: 'saturday', value: 'Saturday'},
-//         {key: 'sunday', value: 'Sunday'},
-//     ];
-
-//     return (
-
-//     )
-
-// }
-
-// export default DayPicker;
 import { useState, useEffect } from 'react'
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -45,7 +23,7 @@ export default function DayPicker(props){
 
     const ToggleDay = async day => {
         if (days.includes(day)) {
-            setDays(days.filter(iDay => iDay != day));
+            setDays(days.filter(iDay => iDay !== day));
         } else {
             setDays([...days, day]);
         }
@@ -63,6 +41,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('monday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('tuesday') ? 'default' : 'outlined'}
@@ -71,6 +50,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('tuesday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('wednesday') ? 'default' : 'outlined'}
@@ -79,6 +59,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('wednesday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('thursday') ? 'default' : 'outlined'}
@@ -87,6 +68,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('thursday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('friday') ? 'default' : 'outlined'}
@@ -95,6 +77,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('friday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('saturday') ? 'default' : 'outlined'}
@@ -103,6 +86,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('saturday')}
+                disabled={true ? props.disabled : false}
             />
             <Chip
                 variant={days.includes('sunday') ? 'default' : 'outlined'}
@@ -111,6 +95,7 @@ export default function DayPicker(props){
                 size='small'
                 color='primary'
                 onClick={() => ToggleDay('sunday')}
+                disabled={true ? props.disabled : false}
             />
         </Box>
     )
