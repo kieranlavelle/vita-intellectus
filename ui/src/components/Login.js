@@ -2,39 +2,87 @@ import React, { useState } from "react"
 
 import { useHistory, Link } from "react-router-dom";
 
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
+
+import { createMuiTheme, useTheme, ThemeProvider  } from '@material-ui/core/styles';
 
 import { AUTH } from '../http'
 import usePersistedState from '../utilities'
+import loginLogo from '../login.svg';
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: ['"Be Vietnam"', 'sans-serif'].join(',')
+  }
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
-    backgroundColor: "#e0e0e0"
+    [theme.breakpoints.up('lg')]: {
+      marginRight: '100px'
+    }
+  },
+  left: {
+    [theme.breakpoints.up('lg')]: {
+      marginLeft: '200px'
+    },
+    textAlign: 'center'
+  },
+  leftHeader: {
+    fontWeight: 700,
+    marginBottom: '100px'
+  },
+  headers: {
+    fontWeight: 500,
+    lineHeight: 1.5,
+  },
+  subHeaders: {
+    fontWeight: 500,
+    color: 'rgb(99, 115, 129)'
   },
   loginForm: {
     padding: "15px",
-    textAlign: 'center',
     backgroundColor: 'white',
     borderRadius: '10px',
-    [theme.breakpoints.up('md')]: {
-      width: '33%'
+    [theme.breakpoints.up('lg')]: {
+      width: '40%'
     }
   },
   formInput: {
     width: '100%',
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   loginButton: {
-    marginTop: '10px'
+    marginTop: '10px',
+    width: '100%',
+    padding: '10px',
+    fontWeight: 700
   },
-  errorMessage: {
-    color: 'red'
+  greenText: {
+    color: 'rgb(0, 171, 85)'
+  },
+  signUpPrompt: {
+    fontWeight: 600,
+    marginTop: '20px',
+    [theme.breakpoints.up('md')]: {
+      paddingRight: '100px',
+      textAlign: 'right',
+    },
+    [theme.breakpoints.down('md')]: {
+      paddingRight: '100px',
+      textAlign: 'right',
+    }
   }
+
 }))
 
 function Login() {
@@ -44,11 +92,83 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
 
-  let login = (event) => {
-    event.preventDefault();
+  const theme = useTheme();
+  const showLeft = useMediaQuery(theme.breakpoints.up('md'));
+
+
+  function Message() {
+    if (errorMessage.length > 0) {
+      return <Alert severity="error">{errorMessage}</Alert>
+    } else if (loggedIn) {
+      console.log('login message')
+      return <Alert severity="success">Success! Logging you in.</Alert>;
+    } else {
+      return "";
+    }
+  }
+
+  const LeftPanel = () => {
+      return (
+        <div className={classes.left}>
+          <Typography gutterBottom variant="h4" className={classes.leftHeader}>
+            Welcome Back!
+          </Typography>
+          <img src={loginLogo} />
+        </div>
+      )
+  }
+
+  const RightPanel = () => {
+    return (
+        <form 
+          className={classes.loginForm}
+        >
+          <ThemeProvider theme={theme}>
+            <Typography gutterBottom variant="h5" className={classes.headers}>
+              Sign In To <span className={classes.greenText}>Vita</span>
+            </Typography>
+            <Typography gutterBottom className={classes.subHeaders}>
+              Enter your details below
+            </Typography>
+          </ThemeProvider>
+          <Message />
+          <TextField
+            label="Email"
+            className={classes.formInput}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="outlined"
+            color="primary"
+            required
+          />
+          <TextField
+            label="Password"
+            className={classes.formInput}
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            color="primary"
+            required
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            onClickCapture={(e) => login(e)}
+            className={classes.loginButton}
+          >
+            Login
+          </Button>
+        </form>
+    )
+  }
+
+  let login = (e) => {
+    console.log(e)
+    e.preventDefault();
 
     let formData = new FormData();
     formData.append('username', email);
@@ -57,7 +177,8 @@ function Login() {
     AUTH.post('login', formData)
         .then(response => {
           setToken(response.data.access_token);
-          history.push('/home')
+          setLoggedIn(true);
+          setTimeout(function(){history.push('/home')}, 1000);
         })
         .catch(error => {
           setErrorMessage(error.response.data.detail);
@@ -65,43 +186,27 @@ function Login() {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      className={classes.root}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <form 
-        className={classes.loginForm}
-      >
-        <h1>Login</h1>
-        <p className={classes.errorMessage}>{errorMessage}</p>
-        <TextField
-          label="Email"
-          className={classes.formInput}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          className={classes.formInput}
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}/>
-        <Link to="/register">
-          Don't have an account? Sign up here.
-        </Link>
-        <br/>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          onClick={login}
-          className={classes.loginButton}
+    <div className={classes.container}>
+        <Typography
+          className={classes.signUpPrompt}
         >
-          Login
-        </Button>
-      </form>
-    </Box>
+          Don't have an account? <Link to="/register"
+            className={classes.greenText}
+            style={{textDecoration: 'none'}}
+            onClick={() => history.push('/register')}
+          >Get started.</Link>
+        </Typography>
+      <Box
+        display="flex"
+        flexDirection="row"
+        className={classes.root}
+        justifyContent={showLeft ? 'space-between' : 'center'}
+        alignItems="center"
+      >
+        {showLeft ? <LeftPanel /> : <span />}
+        <RightPanel />
+      </Box>
+    </div>
   )
 }
 

@@ -16,6 +16,14 @@ function getHabits(token){
   })
 }
 
+function habitInfo(token, habitID) {
+  return API.get(`habit/${habitID}/info`, {
+    headers: {
+      Authorization: token,
+    }
+  })
+}
+
 function createHabit(token, body){
   return API.post('habit', body, {
     headers: {
@@ -40,9 +48,29 @@ function deleteHabit(token, habitID) {
   })
 }
 
+function getFullHabits(token) {
+  API.get('habits', {
+    headers: {
+      Authorization: token,
+    }
+  }).then(response => {
+    let habits = response.data.habits;
+    habits = habits.map((habit, index) => {
+      habitInfo(token, habit.id)
+        .then(response => {
+          return Object.assign({}, habit, response.data.info);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    })
+  })
+}
+
 export {
   completeHabit,
   getHabits,
+  habitInfo,
   createHabit,
   editHabit,
   deleteHabit

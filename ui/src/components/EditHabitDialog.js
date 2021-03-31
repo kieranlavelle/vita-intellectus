@@ -73,7 +73,7 @@ function EditHabitDialog(props){
               onChange={(e) => setHabitName(e.target.value)}
               fullWidth
             />
-            <DayPicker disabled={true} updateDays={setDays} selectedDays={currentDays}/>
+            <DayPicker disabled={true} updateDays={setDays} selectedDays={days}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => {setOpen(false)}} color="secondary" variant="outlined">

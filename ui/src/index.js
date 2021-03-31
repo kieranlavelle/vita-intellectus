@@ -4,12 +4,26 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+
 import Router from './components/Router'
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: 'rgb(0, 171, 85)',
+    },
+    secondary: {
+      main: '#ff1744',
+    }
+  },
+})
+
 ReactDOM.render(
-  <Router>
-    <App />
-  </Router>,
+  <ThemeProvider theme={theme}>
+    <Router>
+    </Router>
+  </ThemeProvider>,
   document.getElementById('root')
 );
 

@@ -6,34 +6,84 @@ import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+
+import { createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
 
 import { AUTH } from '../http'
+import usePersistedState from '../utilities'
+import loginLogo from '../login.svg';
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: ['"Be Vietnam"', 'sans-serif'].join(',')
+  }
+});
 
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
-    backgroundColor: "#e0e0e0"
+    backgroundColor: 'white',
+    [theme.breakpoints.up('md')]: {
+      marginRight: '100px'
+    }
   },
-  registerForm: {
+  left: {
+    [theme.breakpoints.up('md')]: {
+      marginLeft: '200px'
+    },
+    textAlign: 'center'
+  },
+  leftHeader: {
+    fontWeight: 700,
+    marginBottom: '100px'
+  },
+  headers: {
+    fontWeight: 500,
+    lineHeight: 1.5,
+  },
+  subHeaders: {
+    fontWeight: 500,
+    color: 'rgb(99, 115, 129)'
+  },
+  container: {
+  },
+  loginForm: {
     padding: "15px",
-    textAlign: 'center',
     backgroundColor: 'white',
     borderRadius: '10px',
     [theme.breakpoints.up('md')]: {
-      width: '33%'
+      width: '40%'
     }
   },
   formInput: {
     width: '100%',
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
-  registerButton: {
-    marginTop: '10px'
+  loginButton: {
+    marginTop: '10px',
+    width: '100%',
+    padding: '10px',
+    fontWeight: 700
   },
   errorMessage: {
     color: 'red'
+  },
+
+  greenText: {
+    color: 'rgb(0, 171, 85)'
+  },
+  signUpPrompt: {
+    fontWeight: 600,
+    marginTop: '20px',
+    textAlign: 'right',
+    [theme.breakpoints.up('md')]: {
+      paddingRight: '100px'
+    }
   }
+
 }))
 
 function Register() {
@@ -44,9 +94,8 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [token, setToken] = usePersistedState('token', '');
 
   let register = (event) => {
     event.preventDefault();
@@ -70,50 +119,81 @@ function Register() {
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      className={classes.root}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <form 
-        className={classes.registerForm}
-      >
-        <h1>Sign Up</h1>
-        <p className={classes.errorMessage}>{errorMessage}</p>
-        <TextField
-          label="Email"
-          className={classes.formInput}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          className={classes.formInput}
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <TextField
-          label="Confirm Password"
-          className={classes.formInput}
-          type="password"
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-        <Link to="/login">
-          Already have an account? Click here.
-        </Link>
-        <br/>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          onClick={register}
-          className={classes.registerButton}
+    <div className={classes.container}>
+        <Typography
+          className={classes.signUpPrompt}
         >
-          Sign Up
-        </Button>
-      </form>
-    </Box>
+          Already have an account? <Link to="/login"
+            className={classes.greenText}
+            style={{textDecoration: 'none'}}
+            onClick={() => history.push('/login')}
+          >Login.</Link>
+        </Typography>
+      <Box
+        display="flex"
+        flexDirection="row"
+        className={classes.root}
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <div className={classes.left}>
+          <Typography gutterBottom variant="h4" className={classes.leftHeader}>
+            Come on in!
+          </Typography>
+          <img src={loginLogo} />
+        </div>
+        <form 
+          className={classes.loginForm}
+        >
+          {/* <h3>Sign In To Vita</h3> */}
+          <ThemeProvider theme={theme}>
+            <Typography gutterBottom variant="h5" className={classes.headers}>
+              Sign Up To Vita
+            </Typography>
+            <Typography gutterBottom variant="p" className={classes.subHeaders}>
+              Enter your details below
+            </Typography>
+          </ThemeProvider>
+          <p className={classes.errorMessage}>{errorMessage}</p>
+          <TextField
+            label="Email"
+            className={classes.formInput}
+            onChange={(e) => setEmail(e.target.value)}
+            variant="outlined"
+            color="primary"
+            required
+          />
+          <TextField
+            label="Password"
+            className={classes.formInput}
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            color="primary"
+            required
+          />
+          <TextField
+            label="Confirm password"
+            className={classes.formInput}
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            variant="outlined"
+            color="primary"
+            required
+          />
+          <br/>
+          <Button
+            variant="contained"
+            color="primary"
+            type="submit"
+            onClick={register}
+            className={classes.loginButton}
+          >
+            Sign Up
+          </Button>
+        </form>
+      </Box>
+    </div>
   )
 }
 

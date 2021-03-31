@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 import usePersistedState from '../utilities';
-import { getHabits } from '../endpoints'
+import { getHabits, habitInfo } from '../endpoints'
 
 import Nav from './Navbar'
 import HomeToolbar from './HomeToolbar'
@@ -22,6 +22,8 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
+function getFullHabits(){}
+
 function Home() {
   const [token, setToken] = usePersistedState('token', '');
   const classes = useStyles();
@@ -31,15 +33,31 @@ function Home() {
 
 
   useEffect(() => {
-    getHabits(token).then(response => {
-      setHabits(response.data.habits);
-    }).catch(error => {
-      if (error.response.status === 401) {
-        setToken('');
-        history.push('/login');
-      }
-    })
+    getHabits(token)
+      .then(response => {
+        setHabits(response.data.habits);
+      })
+      .catch(error => {
+        console.log(error);
+        if (error.response.status === 401) {
+          setToken('');
+          history.push('/login');
+        }
+      })
   }, [])
+
+  useEffect(() => {
+    console.log(habits)
+    setHabits(habits.map((habit, index) => {
+      habitInfo(token, habit.id)
+        .then(response => {
+          return Object.assign({}, habit, response.data.info);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    }));
+  }, []);
 
   const onDeleteHabit = (id) => {
     const newHabits = [];
