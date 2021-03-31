@@ -1,20 +1,17 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 import { Box } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
-    chipHolder: {
-      
-    },
-
     picker: {
         marginTop: theme.spacing(1),
-      },
-      chip: {
+    },
+    chip: {
         margin: theme.spacing(0.5),
-      },
+    },
 }));
 
 export default function DayPicker(props){
@@ -99,5 +96,9 @@ export default function DayPicker(props){
             />
         </Box>
     )
+}
 
+DayPicker.PropTypes = {
+    selectedDays: PropTypes.arrayOf(PropTypes.string),
+    updateDays: PropTypes.func.isRequired
 }

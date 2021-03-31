@@ -7,9 +7,9 @@ import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import Alert from '@material-ui/lab/Alert';
 
-import { createMuiTheme } from '@material-ui/core/styles';
-import { ThemeProvider } from '@material-ui/styles';
+import { createMuiTheme, useTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import { AUTH } from '../http'
 import usePersistedState from '../utilities'
@@ -97,8 +97,11 @@ function Register() {
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
 
-  let register = (event) => {
-    event.preventDefault();
+  const theme = useTheme();
+  const showLeft = useMediaQuery(theme.breakpoints.up('md'));
+
+  let register = (e) => {
+    e.preventDefault();
 
     if (password !== confirmPassword) {
       setErrorMessage("password's don't match");
@@ -118,6 +121,82 @@ function Register() {
         })
   };
 
+  function Message() {
+    if (errorMessage.length > 0) {
+      return <Alert severity="error">{errorMessage}</Alert>
+    } else if (loggedIn) {
+      console.log('login message')
+      return <Alert severity="success">Success! Logging you in.</Alert>;
+    } else {
+      return "";
+    }
+  }
+
+  const LeftPanel = () => {
+      return (
+        <div className={classes.left}>
+          <Typography gutterBottom variant="h4" className={classes.leftHeader}>
+            Come on in!
+          </Typography>
+          <img src={loginLogo} />
+        </div>
+      )
+  }
+
+  const RightPanel = () => {
+    return (
+      <form 
+        className={classes.loginForm}
+      >
+        <ThemeProvider theme={theme}>
+          <Typography gutterBottom variant="h5" className={classes.headers}>
+            Sign Up To Vita
+          </Typography>
+          <Typography gutterBottom variant="p" className={classes.subHeaders}>
+            Enter your details below
+          </Typography>
+        </ThemeProvider>
+        <p className={classes.errorMessage}>{errorMessage}</p>
+        <TextField
+          label="Email"
+          className={classes.formInput}
+          onChange={(e) => setEmail(e.target.value)}
+          variant="outlined"
+          color="primary"
+          required
+        />
+        <TextField
+          label="Password"
+          className={classes.formInput}
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+          variant="outlined"
+          color="primary"
+          required
+        />
+        <TextField
+          label="Confirm password"
+          className={classes.formInput}
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+          variant="outlined"
+          color="primary"
+          required
+        />
+        <br/>
+        <Button
+          variant="contained"
+          color="primary"
+          type="submit"
+          onClick={register}
+          className={classes.loginButton}
+        >
+          Sign Up
+        </Button>
+      </form>
+    )
+  }
+
   return (
     <div className={classes.container}>
         <Typography
@@ -136,62 +215,8 @@ function Register() {
         justifyContent="space-between"
         alignItems="center"
       >
-        <div className={classes.left}>
-          <Typography gutterBottom variant="h4" className={classes.leftHeader}>
-            Come on in!
-          </Typography>
-          <img src={loginLogo} />
-        </div>
-        <form 
-          className={classes.loginForm}
-        >
-          {/* <h3>Sign In To Vita</h3> */}
-          <ThemeProvider theme={theme}>
-            <Typography gutterBottom variant="h5" className={classes.headers}>
-              Sign Up To Vita
-            </Typography>
-            <Typography gutterBottom variant="p" className={classes.subHeaders}>
-              Enter your details below
-            </Typography>
-          </ThemeProvider>
-          <p className={classes.errorMessage}>{errorMessage}</p>
-          <TextField
-            label="Email"
-            className={classes.formInput}
-            onChange={(e) => setEmail(e.target.value)}
-            variant="outlined"
-            color="primary"
-            required
-          />
-          <TextField
-            label="Password"
-            className={classes.formInput}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            variant="outlined"
-            color="primary"
-            required
-          />
-          <TextField
-            label="Confirm password"
-            className={classes.formInput}
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            variant="outlined"
-            color="primary"
-            required
-          />
-          <br/>
-          <Button
-            variant="contained"
-            color="primary"
-            type="submit"
-            onClick={register}
-            className={classes.loginButton}
-          >
-            Sign Up
-          </Button>
-        </form>
+        {showLeft ? <LeftPanel /> : <span />}
+        <RightPanel />
       </Box>
     </div>
   )
