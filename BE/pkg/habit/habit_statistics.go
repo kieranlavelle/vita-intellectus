@@ -88,6 +88,9 @@ func completionPercentage(h *Habit, hc HabitCompletions) float32 {
 
 	nExpected := float32(len(expectedCompletions))
 	nActual := float32(len(habitDaysThisMonth))
+	if nActual == 0 {
+		return 0
+	}
 
 	return nExpected / nActual
 }

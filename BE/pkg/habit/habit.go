@@ -39,16 +39,16 @@ var dayToIndex = map[string]int{
 
 // Habit represents a habbit a user wants to set
 type Habit struct {
-	ID        int      `json:"id"`
-	UID       int      `json:"user_id"`
-	Name      string   `json:"name"`
-	Days      []string `json:"days"`
-	Tags      []string `json:"tags"`
-	Completed bool     `json:"completed"`
+	ID         int       `json:"id"`
+	UID        int       `json:"user_id"`
+	Name       string    `json:"name"`
+	Days       []string  `json:"days"`
+	Tags       []string  `json:"tags"`
+	Completed  bool      `json:"completed"`
+	Statistics HabitInfo `json:"statistics"`
 }
 
 type HabitInfo struct {
-	ID                int     `json:"habit_id"`
 	Streak            int     `json:"streak"`
 	Consecutive       int     `json:"consecutive"`
 	CompletionPercent float32 `json:"28_day_percent"`
@@ -98,6 +98,13 @@ func Habits(uid int, c *pgxpool.Pool) ([]Habit, error) {
 		if err != nil {
 			return []Habit{}, err
 		}
+
+		info, err := h.Info(c)
+		if err != nil {
+			return []Habit{}, err
+		}
+		h.Statistics = info
+
 		habits = append(habits, h)
 	}
 
@@ -137,6 +144,12 @@ func (h *Habit) Update(c *pgxpool.Pool) error {
 		}
 		return &Error{"cant update property [days] of habit"}
 	}
+
+	// if there are no days then default to all
+	if len(h.Days) == 0 {
+		h.Days = allDays
+	}
+
 	return insertHabit(h, c)
 }
 
@@ -187,7 +200,7 @@ func (h *Habit) Completions(c *pgxpool.Pool) (HabitCompletions, error) {
 // as the number of times it has been completed in a row
 func (h *Habit) Info(c *pgxpool.Pool) (HabitInfo, error) {
 
-	hInfo := HabitInfo{ID: h.ID}
+	hInfo := HabitInfo{}
 	completions, err := h.Completions(c)
 	if err != nil {
 		return HabitInfo{}, err

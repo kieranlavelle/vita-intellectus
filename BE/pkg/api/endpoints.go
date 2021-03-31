@@ -339,9 +339,17 @@ func Habits(env *Env) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string][]h.Habit{
+		err = json.NewEncoder(w).Encode(map[string][]h.Habit{
 			"habits": habits,
 		})
+
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{
+				"detail": err.Error(),
+			})
+		}
 	}
 }
 
