@@ -2,6 +2,7 @@ import React, { useState } from "react"
 
 import { useHistory, Link } from "react-router-dom";
 
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';

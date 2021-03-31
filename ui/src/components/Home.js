@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from "react-router-dom";
 
+import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -10,19 +11,19 @@ import { getHabits, habitInfo } from '../endpoints'
 import Nav from './Navbar'
 import HomeToolbar from './HomeToolbar'
 import HabitCard from './HabitCard'
+import SideDrawer from './Drawer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
-    backgroundColor: "#e0e0e0",
+    // backgroundColor: "#e0e0e0",
   },
-  habitContainer: {
+  habits: {
     padding: theme.spacing(2)
+  },
+  drawer: {
   }
 }))
-
-
-function getFullHabits(){}
 
 function Home() {
   const [token, setToken] = usePersistedState('token', '');
@@ -46,19 +47,6 @@ function Home() {
       })
   }, [])
 
-  useEffect(() => {
-    console.log(habits)
-    setHabits(habits.map((habit, index) => {
-      habitInfo(token, habit.id)
-        .then(response => {
-          return Object.assign({}, habit, response.data.info);
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    }));
-  }, []);
-
   const onDeleteHabit = (id) => {
     const newHabits = [];
     habits.forEach((val, index) => {
@@ -76,24 +64,35 @@ function Home() {
 
   return (
     <div className={classes.root}>
-      <Nav />
-      <HomeToolbar token={token} onNewHabit={onNewHabit}/>
-      <Grid
-        container
-        direction="row"
-        justify="flex-start"
-        alignItems="flex-start"
-        className={classes.habitContainer}
+      {/* <Nav /> */}
+      <Box
+        display="flex"
+        flex="row"
+        className={classes.root}
       >
-        {habits.map(habit => 
-          <HabitCard
-            key={habit.id}
-            token={token}
-            onDeleteHabit={onDeleteHabit}
-            {...habit}
-          />
-        )}
-      </Grid>
+        <SideDrawer className={classes.drawer}/>
+        <div style={{width: '100%'}} className={classes.habits}>
+          <Nav />
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            // className={classes.habits}
+          >
+            {habits.map(habit => 
+              <HabitCard
+                key={habit.id}
+                token={token}
+                onDeleteHabit={onDeleteHabit}
+                {...habit}
+              />
+            )}
+          </Grid>
+        </div>
+      </Box>
+      {/* <SideDrawer className={classes.drawer}/> */}
+      {/* <HomeToolbar token={token} onNewHabit={onNewHabit}/> */}
     </div>
   )
 }

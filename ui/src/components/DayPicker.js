@@ -98,7 +98,7 @@ export default function DayPicker(props){
     )
 }
 
-DayPicker.PropTypes = {
+DayPicker.propTypes = {
     selectedDays: PropTypes.arrayOf(PropTypes.string),
     updateDays: PropTypes.func.isRequired
 }

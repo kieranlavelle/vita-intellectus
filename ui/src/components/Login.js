@@ -81,7 +81,6 @@ const useStyles = makeStyles((theme) => ({
       textAlign: 'right',
     }
   }
-
 }))
 
 function Login() {
@@ -89,8 +88,8 @@ function Login() {
   const classes = useStyles();
   const history = useHistory();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
@@ -121,7 +120,17 @@ function Login() {
       )
   }
 
-  const RightPanel = () => {
+  const RightPanel = (props) => {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const {onSubmit} = props;
+
+    const submitForm = (e, email, password) => {
+      e.preventDefault();
+      onSubmit(email, password);
+    }
+
     return (
         <form 
           className={classes.loginForm}
@@ -138,7 +147,8 @@ function Login() {
           <TextField
             label="Email"
             className={classes.formInput}
-            onChange={(e) => setEmail(e.target.value)}
+            onChangeCapture={(e) => setEmail(e.target.value)}
+            value={email}
             variant="outlined"
             color="primary"
             required
@@ -156,7 +166,7 @@ function Login() {
             variant="contained"
             color="primary"
             type="submit"
-            onClickCapture={(e) => login(e)}
+            onClickCapture={(e) => submitForm(e, email, password)}
             className={classes.loginButton}
           >
             Login
@@ -165,9 +175,9 @@ function Login() {
     )
   }
 
-  let login = (e) => {
-    console.log(e)
-    e.preventDefault();
+  let login = (email, password) => {
+
+    console.log(email);
 
     let formData = new FormData();
     formData.append('username', email);
@@ -203,7 +213,7 @@ function Login() {
         alignItems="center"
       >
         {showLeft ? <LeftPanel /> : <span />}
-        <RightPanel />
+        <RightPanel onSubmit={login}/>
       </Box>
     </div>
   )
