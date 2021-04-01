@@ -31,7 +31,7 @@ function Router() {
 
     return (
         <div>
-            <BrowserRouter basename={process.env.PUBLIC_URL}>
+            <BrowserRouter>
                 <Switch>
                     <ProtectedRoute path="/" exact token={token}>
                         <Home />
