@@ -11,12 +11,10 @@ import { getHabits, habitInfo } from '../endpoints'
 import Nav from './Navbar'
 import HomeToolbar from './HomeToolbar'
 import HabitCard from './HabitCard'
-import SideDrawer from './Drawer';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100vh",
-    // backgroundColor: "#e0e0e0",
   },
   habits: {
     padding: theme.spacing(2)
@@ -64,35 +62,30 @@ function Home() {
 
   return (
     <div className={classes.root}>
-      {/* <Nav /> */}
       <Box
         display="flex"
         flex="row"
         className={classes.root}
       >
-        <SideDrawer className={classes.drawer}/>
         <div style={{width: '100%'}} className={classes.habits}>
           <Nav />
+          <HomeToolbar token={token} onNewHabit={onNewHabit}/>
           <Grid
             container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            // className={classes.habits}
           >
             {habits.map(habit => 
-              <HabitCard
-                key={habit.id}
-                token={token}
-                onDeleteHabit={onDeleteHabit}
-                {...habit}
-              />
+              <Grid item lg={4} key={habit.id}>
+                <HabitCard
+                  key={habit.id}
+                  token={token}
+                  onDeleteHabit={onDeleteHabit}
+                  {...habit}
+                />
+              </Grid>
             )}
           </Grid>
         </div>
       </Box>
-      {/* <SideDrawer className={classes.drawer}/> */}
-      {/* <HomeToolbar token={token} onNewHabit={onNewHabit}/> */}
     </div>
   )
 }

@@ -149,14 +149,12 @@ function Register() {
       <form 
         className={classes.loginForm}
       >
-        <ThemeProvider theme={theme}>
-          <Typography gutterBottom variant="h5" className={classes.headers}>
-            Sign Up To Vita
-          </Typography>
-          <Typography gutterBottom variant="p" className={classes.subHeaders}>
-            Enter your details below
-          </Typography>
-        </ThemeProvider>
+        <Typography gutterBottom variant="h5" className={classes.headers}>
+          Sign Up To Vita
+        </Typography>
+        <Typography gutterBottom variant="p" className={classes.subHeaders}>
+          Enter your details below
+        </Typography>
         <p className={classes.errorMessage}>{errorMessage}</p>
         <TextField
           label="Email"

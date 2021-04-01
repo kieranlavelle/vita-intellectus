@@ -9,6 +9,9 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import Router from './components/Router'
 
 const theme = createMuiTheme({
+  typography: {
+    fontFamily: ['"Be Vietnam"', 'sans-serif'].join(',')
+  },
   palette: {
     primary: {
       main: 'rgb(0, 171, 85)',

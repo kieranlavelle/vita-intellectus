@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
 
+import ChipInput from './ChipInput';
 import DayPicker from './DayPicker'
 import { createHabit } from '../endpoints';
 
@@ -34,6 +35,7 @@ function NewHabitDialog(props){
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [days, setDays] = useState([]);
+  const [tags, setTags] = useState([]);
   const [habitName, setHabitName] = useState("");
 
   const hableSubmit = () => {
@@ -41,6 +43,7 @@ function NewHabitDialog(props){
     const habit = {
       name: habitName,
       days: days,
+      tags: tags
     }
     createHabit(props.token, habit)
       .then(response => {
@@ -70,6 +73,8 @@ function NewHabitDialog(props){
           </DialogContentText>
             <TextField
               autoFocus
+              variant="outlined"
+              color="primary"
               margin="dense"
               id="name"
               type="text"
@@ -77,6 +82,7 @@ function NewHabitDialog(props){
               onChange={(e) => setHabitName(e.target.value)}
               fullWidth
             />
+            <ChipInput onChange={setTags}/>
             <DayPicker updateDays={setDays}/>
         </DialogContent>
         <DialogActions>

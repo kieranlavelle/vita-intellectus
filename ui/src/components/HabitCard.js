@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 
 import Typography from '@material-ui/core/Typography';
 
-import Grid from '@material-ui/core/Grid';
-
+import Chip from '@material-ui/core/Chip';
+import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
+import CardHeader from '@material-ui/core/CardHeader';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -30,29 +31,29 @@ const useStyles = makeStyles((theme) => ({
       width: "48%"
     },
     [theme.breakpoints.up('lg')]: {
-      width: "30%"
+      width: "95%"
     },
     backgroundColor: "white",
     margin: theme.spacing(1),
-    padding: theme.spacing(1)
+    padding: theme.spacing(0.5)
   },
   hoverDelete: {
     color: 'red',
-    scale: 1.2
+    scale: 1.5
   },
   delete: {
     scale: 1
   },
   hoverTick: {
     color: 'green',
-    scale: 1.2
+    scale: 1.5
   },
   tick: {
     scale: 1
   },
   hoverEdit: {
     color: 'orange',
-    scale: 1.2
+    scale: 1.5
   },
   edit: {
     scale: 1
@@ -60,12 +61,21 @@ const useStyles = makeStyles((theme) => ({
   'MuiIconButton-root': {
     padding: '0px'
   },
-  statsTitle: {
-    color: "Gray",
-  },
   statistics: {
-    fontWeight: 'bold',
-    color: 'DimGray'
+    width: '100%',
+    marginBottom: '10px'
+  },
+  statsTitle: {
+    color: "rgb(99, 115, 129)",
+    fontWeight: 200
+  },
+  habitTitle: {
+    fontWeight: 400,
+    color: "rgb(99, 115, 129)",
+    marginBottom: '10px'
+  },
+  tagChip: {
+    margin: '5px'
   }
 }))
 
@@ -82,6 +92,7 @@ function HabitCard(props){
 
   const [name, setName] = useState(props.name);
   const [completed, setCompleted] = useState(props.completed);
+  const [tags, setTags] = useState(props.tags);
 
   const [streak, setStreak] = useState(0);
   const [consecutive, setConsecutive] = useState(0);
@@ -103,6 +114,7 @@ function HabitCard(props){
 
   const onEdit = (habit) => {
     setName(habit.name);
+    setTags(habit.tags);
   }
 
   const onComplete = () => {
@@ -127,6 +139,65 @@ function HabitCard(props){
     })
   }
 
+  const Actions = () => {
+
+    return (
+        <CardActions className={classes.actions}>
+          <Box
+            display="flex"
+            justifyContent="space-evenly"
+            width='100%'
+          >
+            <div>
+              <IconButton
+                className={classes['MuiIconButton-root']}
+                onMouseEnter={() => sethoverDelete(true)}
+                onMouseLeave={() => sethoverDelete(false)}
+                onClick={onDelete}
+              >
+                <DeleteIcon
+                  className={hoverDelete ? classes.hoverDelete : classes.delete}
+                />
+              </IconButton>
+            </div>
+            <div>
+              <IconButton
+                className={classes['MuiIconButton-root']}
+                onMouseEnter={() => setHoverTick(true)}
+                onMouseLeave={() => setHoverTick(false)}
+                onClick={onComplete}
+              >
+                <DoneIcon
+                  className={(hoverTick || completed) ? classes.hoverTick : classes.tick}
+                />
+              </IconButton>
+            </div>
+            <div>
+              <IconButton
+                className={classes['MuiIconButton-root']}
+                onMouseEnter={() => setHoverEdit(true)}
+                onMouseLeave={() => setHoverEdit(false)}
+                onClick={() => setEditHabit(true)}
+              >
+                <EditIcon
+                  className={hoverEdit ? classes.hoverEdit : classes.edit}
+                />
+              </IconButton>
+              <EditHabitDialog
+                open={editHabit}
+                setOpen={setEditHabit}
+                currentDays={props.days}
+                currentTags={tags}
+                name={name}
+                onEdit={onEdit}
+                {...props}
+              />
+            </div>
+          </Box>
+      </CardActions>
+    )
+  }
+
   return (
     <Card
       variant="elevation"
@@ -135,72 +206,51 @@ function HabitCard(props){
       onMouseEnter={() => setElevation(10)}
       onMouseLeave={() => setElevation(5)}
     >
-      <Typography variant="overline" style={{fontSize: 14, fontWeight: 'bold'}}>
-        {name}
-      </Typography>
-        <Grid container spacing={3}>
-          <Grid item lg={4}>
-            <Typography style={{textAlign: 'center', fontSize: 12}}>
-              <span className={classes.statsTitle}>Streak</span>
-              <br/>
-              <span className={classes.statistics}>{streak}</span>
-            </Typography>
-          </Grid>
-          <Grid item lg={4}>
-            <Typography style={{textAlign: 'center'}}>
-              <span className={classes.statsTitle}>Consecutive</span>
-              <br/>
-              <span className={classes.statistics}>{consecutive}</span>
-            </Typography>
-          </Grid>
-          <Grid item lg={4}>
-            <Typography style={{textAlign: 'center'}}>
-              <span className={classes.statsTitle}>1M Percent</span>
-              <br/>
-              <span className={classes.statistics}>{Math.round(percentage*100)}</span>
-            </Typography>
-          </Grid>
-        </Grid>
-      <CardActions style={{float: 'right'}}>
-        <IconButton
-          className={classes['MuiIconButton-root']}
-          onMouseEnter={() => sethoverDelete(true)}
-          onMouseLeave={() => sethoverDelete(false)}
-          onClick={onDelete}
-        >
-          <DeleteIcon
-            className={hoverDelete ? classes.hoverDelete : classes.delete}
-          />
-        </IconButton>
-        <IconButton
-          className={classes['MuiIconButton-root']}
-          onMouseEnter={() => setHoverTick(true)}
-          onMouseLeave={() => setHoverTick(false)}
-          onClick={onComplete}
-        >
-          <DoneIcon
-            className={(hoverTick || completed) ? classes.hoverTick : classes.tick}
-          />
-        </IconButton>
-        <IconButton
-          className={classes['MuiIconButton-root']}
-          onMouseEnter={() => setHoverEdit(true)}
-          onMouseLeave={() => setHoverEdit(false)}
-          onClick={() => setEditHabit(true)}
-        >
-          <EditIcon
-            className={hoverEdit ? classes.hoverEdit : classes.edit}
-          />
-        </IconButton>
-        <EditHabitDialog
-          open={editHabit}
-          setOpen={setEditHabit}
-          currentDays={['monday']}
-          name={name}
-          onEdit={onEdit}
-          {...props}
-        />
-      </CardActions>
+      <CardHeader
+        title={
+          <Typography
+            className={classes.habitTitle}
+            variant="h6"
+          >
+            {name}
+          </Typography>
+        }
+        action={
+          tags.slice(0, 2).map((value, index) => {
+            return <Chip
+                    className={classes.tagChip}
+                    key={index}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    label={value}
+                  />
+          })
+        }
+      />
+      <Box display="flex" justifyContent="space-evenly" className={classes.statistics}>
+        <div>
+          <Typography
+            style={{fontWeight: 600}}
+            variant="h4"
+            color="primary"
+          >
+            {streak}
+          </Typography>
+          <Typography className={classes.statsTitle}>Streak</Typography>
+        </div>
+        <div>
+          <Typography
+            style={{fontWeight: 600}}
+            variant="h4"
+            color="primary"
+          >
+            {Math.round(percentage*100)}%
+          </Typography>
+          <Typography className={classes.statsTitle}>28 day</Typography>
+        </div>
+      </Box>
+      <Actions/>
     </Card>
   )
 }

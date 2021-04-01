@@ -12,6 +12,7 @@ import TextField from '@material-ui/core/TextField';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import ChipInput from './ChipInput'
 import DayPicker from './DayPicker'
 import { editHabit } from '../endpoints';
 
@@ -31,15 +32,17 @@ const useStyles = makeStyles((theme) => ({
 function EditHabitDialog(props){
 
   const classes = useStyles();
-  const {open, setOpen, currentDays, name, onEdit} = props;
+  const {open, setOpen, currentDays, name, currentTags, onEdit} = props;
 
   const [days, setDays] = useState(currentDays ? currentDays : []);
+  const [tags, setTags] = useState(currentTags ? currentTags : [])
   const [habitName, setHabitName] = useState(name);
 
   const onSubmit = () => {
 
     const habit = {
-      name: habitName
+      name: habitName,
+      tags: tags
     }
     editHabit(props.token, habit, props.id)
       .then(response => {
@@ -66,6 +69,8 @@ function EditHabitDialog(props){
             <TextField
               autoFocus
               margin="dense"
+              color="primary"
+              variant="outlined"
               id="name"
               type="text"
               label="name"
@@ -73,6 +78,7 @@ function EditHabitDialog(props){
               onChange={(e) => setHabitName(e.target.value)}
               fullWidth
             />
+            <ChipInput onChange={setTags} tags={tags}/>
             <DayPicker disabled={true} updateDays={setDays} selectedDays={days}/>
         </DialogContent>
         <DialogActions>
