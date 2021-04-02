@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
     BrowserRouter,
     Switch,
@@ -18,11 +18,14 @@ function ProtectedRoute(props){
         </Route>
     )
 
-    if (props.token === "") {
-        return <Redirect to="/login" />
-    } else {
-        return authorized;
-    }
+    let show = false;
+    useEffect(() => {
+        if (props.token === "") {
+            return <Redirect to="/login" />
+        }
+    }, [props.token])
+
+    return authorized
 }
 
 function Router() {

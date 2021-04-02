@@ -74,7 +74,7 @@ function Home() {
             container
           >
             {habits.map(habit => 
-              <Grid item lg={4} key={habit.id}>
+              <Grid item lg={4} md={6} sm={6} xs={12} key={habit.id}>
                 <HabitCard
                   key={habit.id}
                   token={token}

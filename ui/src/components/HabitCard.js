@@ -21,18 +21,7 @@ import { completeHabit, deleteHabit, habitInfo } from '../endpoints';
 
 const useStyles = makeStyles((theme) => ({
   habitCard: {
-    [theme.breakpoints.down('sm')]: {
-      width: "98%"
-    },
-    [theme.breakpoints.up('sm')]: {
-      width: "98%"
-    },
-    [theme.breakpoints.up('md')]: {
-      width: "48%"
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: "95%"
-    },
+    width: '95%',
     backgroundColor: "white",
     margin: theme.spacing(1),
     padding: theme.spacing(0.5)

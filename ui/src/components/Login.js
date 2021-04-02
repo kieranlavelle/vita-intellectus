@@ -88,8 +88,6 @@ function Login() {
   const classes = useStyles();
   const history = useHistory();
 
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
@@ -102,7 +100,6 @@ function Login() {
     if (errorMessage.length > 0) {
       return <Alert severity="error">{errorMessage}</Alert>
     } else if (loggedIn) {
-      console.log('login message')
       return <Alert severity="success">Success! Logging you in.</Alert>;
     } else {
       return "";
@@ -176,9 +173,6 @@ function Login() {
   }
 
   let login = (email, password) => {
-
-    console.log(email);
-
     let formData = new FormData();
     formData.append('username', email);
     formData.append('password', password);
