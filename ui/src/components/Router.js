@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import {
     BrowserRouter,
+    HashRouter,
     Switch,
     Route,
     Redirect
@@ -18,7 +19,6 @@ function ProtectedRoute(props){
         </Route>
     )
 
-    let show = false;
     useEffect(() => {
         if (props.token === "") {
             return <Redirect to="/login" />
@@ -34,7 +34,7 @@ function Router() {
 
     return (
         <div>
-            <BrowserRouter>
+            <HashRouter>
                 <Switch>
                     <ProtectedRoute path="/" exact token={token}>
                         <Home />
@@ -49,7 +49,7 @@ function Router() {
                         <Register />
                     </Route>
                 </Switch>
-            </BrowserRouter>
+            </HashRouter>
         </div>
     )
 }
