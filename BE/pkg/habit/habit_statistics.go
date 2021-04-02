@@ -5,6 +5,15 @@ import (
 	"time"
 )
 
+type StatisticsFunc = func(*Habit, HabitCompletions) int
+
+var statistics = map[string]StatisticsFunc{
+	"streak":                    calculateStreak,
+	"consecutive":               consecutiveCompletions,
+	"days_since_last_completed": daysSinceLastCompletion,
+	"total_completions":         numCompletions,
+}
+
 func calculateStreak(h *Habit, completions HabitCompletions) int {
 
 	streak := 0
@@ -69,28 +78,20 @@ func consecutiveCompletions(h *Habit, hc HabitCompletions) int {
 	return consecutive
 }
 
-func completionPercentage(h *Habit, hc HabitCompletions) float32 {
+func numCompletions(h *Habit, hc HabitCompletions) int {
+	return len(hc.Completions)
+}
 
-	// Get's all of the days it should have been completed in the
-	// past 28days
-	dayMinus28 := time.Now().Add(-dayDuration * 28)
-	habitDaysThisMonth := daysBetween(dayMinus28, time.Now(), h.Days)
-
-	// Represents the days we were expected to complete the habit
-	// and we completed it
-	expectedCompletions := []time.Time{}
-	for _, completion := range hc.Completions {
-		weekday := strings.ToLower(completion.Time.Weekday().String())
-		if stringContains(h.Days, weekday) {
-			expectedCompletions = append(expectedCompletions, completion.Time)
-		}
+func daysSinceLastCompletion(h *Habit, hc HabitCompletions) int {
+	if len(hc.Completions) == 0 {
+		// this habit has never been completed
+		return -1
 	}
 
-	nExpected := float32(len(expectedCompletions))
-	nActual := float32(len(habitDaysThisMonth))
-	if nActual == 0 {
-		return 0
+	lastCompletion := hc.Completions[len(hc.Completions)-1]
+	daysSince := time.Now().Sub(lastCompletion.Time).Hours() / 24
+	if daysSince > 0 && (time.Now().Day() != lastCompletion.Time.Day()) {
+		return 1
 	}
-
-	return nExpected / nActual
+	return int(daysSince)
 }

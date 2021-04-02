@@ -39,19 +39,15 @@ var dayToIndex = map[string]int{
 
 // Habit represents a habbit a user wants to set
 type Habit struct {
-	ID         int       `json:"id"`
-	UID        int       `json:"user_id"`
-	Name       string    `json:"name"`
-	Days       []string  `json:"days"`
-	Tags       []string  `json:"tags"`
-	Completed  bool      `json:"completed"`
-	Statistics HabitInfo `json:"statistics"`
-}
-
-type HabitInfo struct {
-	Streak            int     `json:"streak"`
-	Consecutive       int     `json:"consecutive"`
-	CompletionPercent float32 `json:"28_day_percent"`
+	ID            int                    `json:"id"`
+	UID           int                    `json:"user_id"`
+	Name          string                 `json:"name"`
+	Days          []string               `json:"days"`
+	Tags          []string               `json:"tags"`
+	SelectedStats []string               `json:"selected_stats"`
+	Description   string                 `json:"description"`
+	Completed     bool                   `json:"completed"`
+	Statistics    map[string]interface{} `json:"statistics"`
 }
 
 type HabitCompletions struct {
@@ -61,6 +57,7 @@ type HabitCompletions struct {
 type HabitCompletion struct {
 	HabitID int       `json:"habit_id"`
 	Time    time.Time `json:"time"`
+	Notes   string    `json:"notes"`
 }
 
 // Load returns a habit corresponding to the
@@ -94,7 +91,10 @@ func Habits(uid int, c *pgxpool.Pool) ([]Habit, error) {
 
 	for habitRows.Next() {
 		h := Habit{}
-		err = habitRows.Scan(&h.ID, &h.UID, &h.Name, &h.Days, &h.Tags, &h.Completed)
+		err = habitRows.Scan(
+			&h.ID, &h.UID, &h.Name, &h.Days,
+			&h.Tags, &h.Description, &h.Completed,
+		)
 		if err != nil {
 			return []Habit{}, err
 		}
@@ -150,6 +150,10 @@ func (h *Habit) Update(c *pgxpool.Pool) error {
 		h.Days = allDays
 	}
 
+	if len(h.SelectedStats) > 2 {
+		return &Error{"a habit can only have 2 selected statistics."}
+	}
+
 	return insertHabit(h, c)
 }
 
@@ -164,12 +168,23 @@ func (h *Habit) Delete(c *pgxpool.Pool) error {
 // Complete add's an entry into the habit_completions
 // table for a given habit if there isnt one already
 // otherwise it errors
-func (h *Habit) Complete(c *pgxpool.Pool) error {
+func (h *Habit) Complete(notes string, c *pgxpool.Pool) error {
 	if h.Completed {
 		return &Error{"can only complete a habit once a day"}
 	}
 	h.Completed = true
-	return completeHabit(h, c)
+	return completeHabit(h, notes, c)
+}
+
+// UnComplete removes an entry from the habit_completions
+// table for a given habit if there is one already
+// otherwise it errors
+func (h *Habit) UnComplete(c *pgxpool.Pool) error {
+	if !h.Completed {
+		return &Error{"Habit is not completed"}
+	}
+	h.Completed = false
+	return unCompleteHabit(h, c)
 }
 
 // Completions get's all of the times this habit
@@ -185,7 +200,7 @@ func (h *Habit) Completions(c *pgxpool.Pool) (HabitCompletions, error) {
 	hCompletions := HabitCompletions{}
 	for completions.Next() {
 		hc := HabitCompletion{}
-		err := completions.Scan(&hc.HabitID, &hc.Time)
+		err := completions.Scan(&hc.HabitID, &hc.Time, &hc.Notes)
 		if err != nil {
 			return hCompletions, err
 		}
@@ -198,22 +213,16 @@ func (h *Habit) Completions(c *pgxpool.Pool) (HabitCompletions, error) {
 
 // Info gets information about the habit such
 // as the number of times it has been completed in a row
-func (h *Habit) Info(c *pgxpool.Pool) (HabitInfo, error) {
+func (h *Habit) Info(c *pgxpool.Pool) (map[string]interface{}, error) {
 
-	hInfo := HabitInfo{}
+	habitStatistics := map[string]interface{}{}
 	completions, err := h.Completions(c)
 	if err != nil {
-		return HabitInfo{}, err
+		return habitStatistics, err
 	}
 
-	hInfo.Streak = calculateStreak(h, completions)
-
-	// consecutive completions
-	hInfo.Consecutive = consecutiveCompletions(h, completions)
-
-	// percent this month
-	hInfo.CompletionPercent = completionPercentage(h, completions)
-
-	return hInfo, err
-
+	for statisticName, value := range statistics {
+		habitStatistics[statisticName] = value(h, completions)
+	}
+	return habitStatistics, err
 }

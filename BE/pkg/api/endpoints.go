@@ -10,6 +10,10 @@ import (
 	h "github.com/kieranlavelle/vita-intellectus/pkg/habit"
 )
 
+type CompleteBody struct {
+	Notes string `json:"notes"`
+}
+
 // HealthCheck returns a 200 status
 func HealthCheck(env *Env) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -235,9 +239,74 @@ func Complete(env *Env) http.HandlerFunc {
 			return
 		}
 
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "failed to read body", 500)
+			return
+		}
+
+		// don't need to check the unmarshal error as if
+		// the body is incorrect notes will be "" which is
+		// what we want
+		completedNotes := CompleteBody{}
+		json.Unmarshal(body, &completedNotes)
+
 		// Perform some checks and if the specified updates are
 		// valid update the database entry with the new values
-		err = habit.Complete(env.DB)
+		err = habit.Complete(completedNotes.Notes, env.DB)
+		if err != nil {
+			switch err.(type) {
+			case *h.Error:
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]string{
+					"detail": err.Error(),
+				})
+			default:
+				env.internalServerError(w, r, err)
+			}
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]h.Habit{
+			"habit": habit,
+		})
+	}
+}
+
+// UnComplete updates the habit if the user owns it
+// and removes a completion record for today
+func UnComplete(env *Env) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := env.getUser(r)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		// don't need to check the error as it is done
+		// by the router.
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		habit, err := h.Load(id, user.ID, env.DB)
+		if err != nil {
+			switch err.(type) {
+			case *h.Error:
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]string{
+					"detail": err.Error(),
+				})
+			default:
+				env.internalServerError(w, r, err)
+			}
+			return
+		}
+
+		// Perform some checks and if the specified updates are
+		// valid update the database entry with the new values
+		err = habit.UnComplete(env.DB)
 		if err != nil {
 			switch err.(type) {
 			case *h.Error:
@@ -384,8 +453,8 @@ func HabitInfo(env *Env) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]h.HabitInfo{
-			"info": info,
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"statistics": info,
 		})
 	}
 }
