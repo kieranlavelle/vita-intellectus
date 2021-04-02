@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -39,7 +38,6 @@ function EditHabitDialog(props){
   const [habitName, setHabitName] = useState(name);
 
   const onSubmit = () => {
-
     const habit = {
       name: habitName,
       tags: tags
@@ -59,6 +57,7 @@ function EditHabitDialog(props){
     <div>
       <Dialog
         open={open}
+        onClose={() => {setOpen(false)}}
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title">Edit Habit</DialogTitle>
@@ -67,7 +66,6 @@ function EditHabitDialog(props){
             Use the form below to alter a pre-existing habit.
           </DialogContentText>
             <TextField
-              autoFocus
               margin="dense"
               color="primary"
               variant="outlined"
@@ -85,7 +83,7 @@ function EditHabitDialog(props){
           <Button onClick={() => {setOpen(false)}} color="secondary" variant="outlined">
             Close
           </Button>
-          <Button onClick={onSubmit} color="primary" variant="outlined">
+          <Button onClick={() => onSubmit()} color="primary" variant="outlined">
             Edit
           </Button>
         </DialogActions>
@@ -93,10 +91,6 @@ function EditHabitDialog(props){
     </div>
   )
 }
-
-EditHabitDialog.propTypes = {
-  onEdit: PropTypes.func.isRequired,
-};
 
 export default EditHabitDialog;
 
