@@ -93,8 +93,8 @@ func Habits(uid int, c *pgxpool.Pool) ([]Habit, error) {
 		h := Habit{}
 		err = habitRows.Scan(
 			&h.ID, &h.UID, &h.Name, &h.Days,
-			&h.Tags, &h.Description, &h.Completed,
-			&h.SelectedStats,
+			&h.Tags, &h.Description, &h.SelectedStats,
+			&h.Completed,
 		)
 		if err != nil {
 			return []Habit{}, err
