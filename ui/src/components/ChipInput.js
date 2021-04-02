@@ -31,6 +31,15 @@ const ChipInput = (props) => {
     }
   }
 
+  // const handleDelete = (tagValue) => {
+  //   const newTags = tags.map((value, index) => {
+  //     if (value !== tagValue) {
+  //       return value;
+  //     }
+  //   })
+  //   setTags(newTags);
+  // }
+
   useEffect(() => {
     onChange(tags);
   }, [tags, setTags]);
@@ -45,6 +54,7 @@ const ChipInput = (props) => {
           tags.map((value, index) => {
             return <Chip
                     className={classes.tagChip}
+                    // onDelete={() => handleDelete(value)}
                     key={index}
                     size="small"
                     color="primary"

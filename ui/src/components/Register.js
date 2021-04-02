@@ -92,18 +92,13 @@ function Register() {
   const classes = useStyles();
   const history = useHistory();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
 
   const theme = useTheme();
   const showLeft = useMediaQuery(theme.breakpoints.up('md'));
 
-  let register = (e) => {
-    e.preventDefault();
-
+  let register = (email, password, confirmPassword) => {
     if (password !== confirmPassword) {
       setErrorMessage("password's don't match");
     }
@@ -122,17 +117,6 @@ function Register() {
         })
   };
 
-  function Message() {
-    if (errorMessage.length > 0) {
-      return <Alert severity="error">{errorMessage}</Alert>
-    } else if (loggedIn) {
-      console.log('login message')
-      return <Alert severity="success">Success! Logging you in.</Alert>;
-    } else {
-      return "";
-    }
-  }
-
   const LeftPanel = () => {
       return (
         <div className={classes.left}>
@@ -144,7 +128,18 @@ function Register() {
       )
   }
 
-  const RightPanel = () => {
+  const RightPanel = (props) => {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const {onSubmit} = props;
+
+    const submitForm = (e, email, password) => {
+      e.preventDefault();
+      onSubmit(email, password, confirmPassword);
+    }
+
     return (
       <form 
         className={classes.loginForm}
@@ -155,11 +150,12 @@ function Register() {
         <Typography gutterBottom variant="p" className={classes.subHeaders}>
           Enter your details below
         </Typography>
-        <p className={classes.errorMessage}>{errorMessage}</p>
+        <Alert style={{margin: '5px'}} severity="error">{errorMessage}</Alert>
         <TextField
           label="Email"
           className={classes.formInput}
-          onChange={(e) => setEmail(e.target.value)}
+          onChangeCapture={(e) => setEmail(e.target.value)}
+          value={email}
           variant="outlined"
           color="primary"
           required
@@ -168,7 +164,8 @@ function Register() {
           label="Password"
           className={classes.formInput}
           type="password"
-          onChange={(e) => setPassword(e.target.value)}
+          onChangeCapture={(e) => setPassword(e.target.value)}
+          value={password}
           variant="outlined"
           color="primary"
           required
@@ -177,7 +174,8 @@ function Register() {
           label="Confirm password"
           className={classes.formInput}
           type="password"
-          onChange={(e) => setPassword(e.target.value)}
+          onChangeCapture={(e) => setConfirmPassword(e.target.value)}
+          value={confirmPassword}
           variant="outlined"
           color="primary"
           required
@@ -187,7 +185,7 @@ function Register() {
           variant="contained"
           color="primary"
           type="submit"
-          onClick={register}
+          onClick={submitForm}
           className={classes.loginButton}
         >
           Sign Up
@@ -215,7 +213,7 @@ function Register() {
         alignItems="center"
       >
         {showLeft ? <LeftPanel /> : <span />}
-        <RightPanel />
+        <RightPanel onSubmit={register}/>
       </Box>
     </div>
   )
