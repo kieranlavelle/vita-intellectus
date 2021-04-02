@@ -47,6 +47,8 @@ func CreateRoutes() {
 
 	router.HandleFunc("/health", HealthCheck(env)).Methods(methods("GET")...)
 
+	router.HandleFunc("/task", AddTask(env)).Methods(methods("POST")...)
+
 	router.HandleFunc("/habit", AddHabit(env)).Methods(methods("POST")...)
 	router.HandleFunc("/habit/{id:[0-9]+}", DeleteHabit(env)).Methods(methods("DELETE")...)
 	router.HandleFunc("/habit/{id:[0-9]+}", GetHabit(env)).Methods(methods("GET")...)
