@@ -94,11 +94,29 @@ function Register() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [token, setToken] = usePersistedState('token', '');
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const theme = useTheme();
   const showLeft = useMediaQuery(theme.breakpoints.up('md'));
 
+  let login = (email, password) => {
+    let formData = new FormData();
+    formData.append('username', email);
+    formData.append('password', password);
+
+    AUTH.post('login', formData)
+        .then(response => {
+          setToken(response.data.access_token);
+          setLoggedIn(true);
+          setTimeout(function(){history.push('/home')}, 1000);
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.detail);
+        })
+  };
+
   let register = (email, password, confirmPassword) => {
+
     if (password !== confirmPassword) {
       setErrorMessage("password's don't match");
     }
@@ -110,12 +128,22 @@ function Register() {
 
     AUTH.post('register', formData)
         .then(response => {
-          history.push('/login')
+          login(email, password);
         })
         .catch(error => {
           setErrorMessage(error.response.data.detail);
         })
   };
+
+  function Message() {
+    if (errorMessage.length > 0) {
+      return <Alert severity="error">{errorMessage}</Alert>
+    } else if (loggedIn) {
+      return <Alert severity="success">Success! Logging you in.</Alert>;
+    } else {
+      return "";
+    }
+  }
 
   const LeftPanel = () => {
       return (
@@ -135,7 +163,7 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const {onSubmit} = props;
 
-    const submitForm = (e, email, password) => {
+    const submitForm = (e) => {
       e.preventDefault();
       onSubmit(email, password, confirmPassword);
     }
@@ -150,7 +178,8 @@ function Register() {
         <Typography gutterBottom variant="p" className={classes.subHeaders}>
           Enter your details below
         </Typography>
-        <Alert style={{margin: '5px'}} severity="error">{errorMessage}</Alert>
+        {/* <Alert style={{margin: '5px'}} severity="error">{errorMessage}</Alert> */}
+        <Message style={{margin: '5px'}}/>
         <TextField
           label="Email"
           className={classes.formInput}
