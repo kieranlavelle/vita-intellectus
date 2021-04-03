@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -135,19 +136,31 @@ func GetTasks(env *Env) gin.HandlerFunc {
 			}
 		}
 
-		tasks, err := t.Tasks(user.ID, date, env.DB)
+		filter := c.Query("filter")
+		if filter == "" {
+			filter = "due"
+		}
+
+		tasks, err := t.Tasks(user.ID, filter, date, env.DB)
 		if err != nil {
 			logrus.Errorf("error loading task: %v", err)
 			switch err {
 			case pgx.ErrNoRows:
 				c.JSON(http.StatusNotFound, gin.H{
-					"detail": "not found.",
+					"tasks": []string{},
 				})
 				return
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"detail": "failed to get task. please try later",
-				})
+				var e *t.DisplayableError
+				if errors.As(err, &e) {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"detail": err.Error(),
+					})
+				} else {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"detail": "failed to get task. please try later",
+					})
+				}
 				return
 			}
 		}

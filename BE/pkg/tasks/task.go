@@ -75,17 +75,27 @@ func Load(id, uid int, date time.Time, c *pgxpool.Pool) (*Task, error) {
 	return t, err
 }
 
-func Tasks(uid int, date time.Time, c *pgxpool.Pool) ([]*Task, error) {
+func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, error) {
 	tasks, err := getTasks(uid, c)
 	if err != nil {
 		return tasks, err
 	}
 
+	filteredTasks := make([]*Task, 0)
 	for _, task := range tasks {
 		task.SetState(date, c)
+
+		if strings.ToLower(filter) == "all" {
+			filteredTasks = append(filteredTasks, task)
+		} else if task.State == "due" {
+			filteredTasks = append(filteredTasks, task)
+		} else {
+			err = &DisplayableError{s: "please provide a valid filter"}
+			return filteredTasks, err
+		}
 	}
 
-	return tasks, err
+	return filteredTasks, err
 }
 
 func (t *Task) Complete(notes string, date time.Time, c *pgxpool.Pool) (*Task, error) {
