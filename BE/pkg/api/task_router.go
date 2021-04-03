@@ -1,12 +1,29 @@
-import "github.com/gin-gonic/gin"
+package api
 
-func main() {
+import (
+	"context"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4/pgxpool"
+	log "github.com/sirupsen/logrus"
+)
+
+func TaskRouter() (*gin.Engine, *pgxpool.Pool) {
+
+	// form a connection to the database
+	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DB_CONNECTION_STRING"))
+	if err != nil {
+		log.Fatalf("error connecting to DB: %v\n", err)
+	}
+
+	env := &Env{DB: pool}
+
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
 
-	return r
+	r.POST("/task", AddTask(env))
+	r.GET("/task/:task_id", GetTask(env))
+	r.GET("/tasks", GetTasks(env))
+
+	return r, pool
 }

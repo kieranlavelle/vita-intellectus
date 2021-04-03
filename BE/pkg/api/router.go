@@ -20,7 +20,7 @@ func methods(m ...string) (methods []string) {
 }
 
 // CreateRoutes forms a database connecting and sets up the API routes.
-func CreateRoutes() {
+func CreateRoutes() http.Handler {
 
 	// form a connection to the database
 	pool, err := pgxpool.Connect(context.Background(), os.Getenv("DB_CONNECTION_STRING"))
@@ -47,8 +47,6 @@ func CreateRoutes() {
 
 	router.HandleFunc("/health", HealthCheck(env)).Methods(methods("GET")...)
 
-	router.HandleFunc("/task", AddTask(env)).Methods(methods("POST")...)
-
 	router.HandleFunc("/habit", AddHabit(env)).Methods(methods("POST")...)
 	router.HandleFunc("/habit/{id:[0-9]+}", DeleteHabit(env)).Methods(methods("DELETE")...)
 	router.HandleFunc("/habit/{id:[0-9]+}", GetHabit(env)).Methods(methods("GET")...)
@@ -62,5 +60,5 @@ func CreateRoutes() {
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:8004", loggedRouter))
+	return loggedRouter
 }
