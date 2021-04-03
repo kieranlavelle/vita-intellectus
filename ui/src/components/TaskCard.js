@@ -16,7 +16,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
 
 import EditHabitDialog from './EditHabitDialog'
-import { completeHabit, deleteHabit, habitInfo } from '../endpoints';
+import { completeTask, deleteTask } from '../endpoints';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function HabitCard(props){
+function TaskCard(props){
 
   const classes = useStyles();
   const [elevation, setElevation] = useState(5);
@@ -77,37 +77,27 @@ function HabitCard(props){
   const [hoverTick, setHoverTick] = useState(false);
   const [hoverDelete, sethoverDelete] = useState(false);
 
-  const [editHabit, setEditHabit] = useState(false);
+  const [editTask, setEditTask] = useState(false);
 
   const [name, setName] = useState(props.name);
-  const [completed, setCompleted] = useState(props.completed);
+  const [description, setDescription] = useState(props.description)
+  const [state, setCompleted] = useState(props.state);
   const [tags, setTags] = useState(props.tags);
+  const [days, setDays] = useState(props.days);
+  const [date, setDate] = useState(props.days)
 
   const [streak, setStreak] = useState(0);
-  const [consecutive, setConsecutive] = useState(0);
   const [percentage, setPercentage] = useState(0);
 
-  useEffect(() => {
-    habitInfo(props.token, props.id)
-      .then(response => {
-        setStreak(response.data.info.streak);
-        setConsecutive(response.data.info.consecutive);
-        setPercentage(response.data.info['28_day_percent']);
-      })
-      .catch(error => {
-        console.log(`Error for habit id: ${props.id}`)
-        console.log(error);
-      })
-  }, []);
 
-
-  const onEdit = (habit) => {
-    setName(habit.name);
-    setTags(habit.tags);
+  const onEdit = (task) => {
+    setName(task.name);
+    setTags(task.tags);
+    setDescription(task.description)
   }
 
   const onComplete = () => {
-    completeHabit(props.token, props.id).then(
+    completeTask(props.token, props.id).then(
       response => {
         setCompleted(true);
       }
@@ -118,7 +108,7 @@ function HabitCard(props){
   }
 
   const onDelete = () => {
-    deleteHabit(props.token, props.id).then(
+    deleteTask(props.token, props.id).then(
       response => {
         props.onDeleteHabit(props.id);
       }
@@ -157,7 +147,7 @@ function HabitCard(props){
                 onClick={onComplete}
               >
                 <DoneIcon
-                  className={(hoverTick || completed) ? classes.hoverTick : classes.tick}
+                  className={(hoverTick || state === 'completed') ? classes.hoverTick : classes.tick}
                 />
               </IconButton>
             </div>
@@ -173,9 +163,9 @@ function HabitCard(props){
                 />
               </IconButton>
               <EditHabitDialog
-                open={editHabit}
-                setOpen={setEditHabit}
-                currentDays={props.days}
+                open={editTask}
+                setOpen={setEditTask}
+                currentDays={days}
                 currentTags={tags}
                 name={name}
                 onEdit={onEdit}
@@ -244,4 +234,4 @@ function HabitCard(props){
   )
 }
 
-export default HabitCard;
+export default TaskCard;

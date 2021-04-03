@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useHistory } from "react-router-dom";
 
 import Box from '@material-ui/core/Box';
@@ -6,11 +6,11 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
 import usePersistedState from '../utilities';
-import { getHabits, habitInfo } from '../endpoints'
+import { getTasks } from '../endpoints'
 
 import Nav from './Navbar'
 import HomeToolbar from './HomeToolbar'
-import HabitCard from './HabitCard'
+import HabitCard from './TaskCard'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,40 +24,43 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 function Home() {
-  const [token, setToken] = usePersistedState('token', '');
   const classes = useStyles();
   const history = useHistory();
 
-  const [habits, setHabits] = useState([]);
+  const [token, setToken] = usePersistedState('token', '');
+  const [tasks, setTasks] = React.useState([]);
+  const [filter, setFilter] = React.useState('due');
 
 
-  useEffect(() => {
-    getHabits(token)
+  React.useEffect(() => {
+    getTasks(token, filter)
       .then(response => {
-        setHabits(response.data.habits);
+        setTasks(response.data.tasks);
       })
       .catch(error => {
-        console.log(error);
         if (error.response.status === 401) {
           setToken('');
           history.push('/login');
         }
       })
-  }, [])
+  }, [filter])
 
-  const onDeleteHabit = (id) => {
-    const newHabits = [];
-    habits.forEach((val, index) => {
+  const onDelete = (id) => {
+    const newTasks = [];
+    tasks.forEach((val, index) => {
       if (val.id !== id) {
-        newHabits.push(val);
+        newTasks.push(val);
       }
     })
 
-    setHabits(newHabits);
+    setTasks(newTasks);
   }
   
-  const onNewHabit = (habit) => {
-    setHabits([...habits, habit]);
+  const onNew = (task) => {
+    let newTasks = tasks;
+    newTasks.push(task);
+
+    setTasks(newTasks);
   }
 
   return (
@@ -69,20 +72,24 @@ function Home() {
       >
         <div style={{width: '100%'}} className={classes.habits}>
           <Nav />
-          <HomeToolbar token={token} onNewHabit={onNewHabit}/>
+          <HomeToolbar token={token} onNew={onNew} filter={filter} setFilter={setFilter}/>
           <Grid
             container
           >
-            {habits.map(habit => 
-              <Grid item lg={4} md={6} sm={6} xs={12} key={habit.id}>
-                <HabitCard
-                  key={habit.id}
-                  token={token}
-                  onDeleteHabit={onDeleteHabit}
-                  {...habit}
-                />
-              </Grid>
-            )}
+            {
+              tasks.map(task => {
+                return (
+                  <Grid item lg={4} md={6} sm={6} xs={12} key={task.id}>
+                    <HabitCard
+                      key={task.id}
+                      token={token}
+                      onDelete={onDelete}
+                      {...task}
+                    />
+                  </Grid>
+                )
+              })
+            }
           </Grid>
         </div>
       </Box>

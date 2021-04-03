@@ -87,17 +87,19 @@ func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, er
 		return tasks, err
 	}
 
+	if strings.ToLower(filter) != "all" && strings.ToLower(filter) != "due" {
+		err = &DisplayableError{s: "please provide a valid filter"}
+		return tasks, err
+	}
+
 	filteredTasks := make([]*Task, 0)
 	for _, task := range tasks {
 		task.SetState(date, c)
 
 		if strings.ToLower(filter) == "all" {
 			filteredTasks = append(filteredTasks, task)
-		} else if task.State == "due" {
+		} else if task.State != "not-due" && strings.ToLower(filter) == "due" {
 			filteredTasks = append(filteredTasks, task)
-		} else {
-			err = &DisplayableError{s: "please provide a valid filter"}
-			return filteredTasks, err
 		}
 	}
 
