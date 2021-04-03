@@ -126,3 +126,21 @@ func checkAbsoluteCompletion(id, d, m, y int, c *pgxpool.Pool) (bool, error) {
 	err := c.QueryRow(context.Background(), query, id, y, m, d).Scan(&completed)
 	return completed, err
 }
+
+func updateTask(t *Task, c *pgxpool.Pool) error {
+	query := `
+		UPDATE
+			tasks
+		SET
+			name=$1, description=$2, tags=$3
+		WHERE
+			id=$4
+		AND
+			uid=$5
+	`
+
+	_, err := c.Exec(context.Background(), query, t.Name, t.Description, t.Tags,
+		t.ID, t.UID,
+	)
+	return err
+}

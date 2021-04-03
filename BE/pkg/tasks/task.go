@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/kieranlavelle/vita-intellectus/pkg/helpers"
 )
 
 func weekdayToString(weekday int) string {
@@ -54,6 +55,11 @@ func New(t *Task, c *pgxpool.Pool) (*Task, error) {
 	}
 	if t.Tags == nil {
 		t.Tags = make([]string, 0)
+	} else {
+		if len(t.Tags) != len(helpers.Unique(t.Tags)) {
+			err := &DisplayableError{s: "tags must be unique"}
+			return t, err
+		}
 	}
 
 	newTask, err := createEmptyTask(t, c)
@@ -96,6 +102,29 @@ func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, er
 	}
 
 	return filteredTasks, err
+}
+
+func (t *Task) Edit(newTask *Task, date time.Time, c *pgxpool.Pool) (*Task, error) {
+
+	if newTask.Name != "" {
+		t.Name = newTask.Name
+	}
+
+	if newTask.Tags == nil {
+		t.Tags = make([]string, 0)
+	} else if len(newTask.Tags) == len(helpers.Unique(newTask.Tags)) {
+		t.Tags = newTask.Tags
+	}
+
+	t.Description = newTask.Description
+
+	err := updateTask(t, c)
+	if err != nil {
+		return t, err
+	}
+
+	return t, nil
+
 }
 
 func (t *Task) Complete(notes string, date time.Time, c *pgxpool.Pool) (*Task, error) {

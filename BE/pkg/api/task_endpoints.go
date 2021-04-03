@@ -316,3 +316,77 @@ func UnCompleteTask(env *Env) gin.HandlerFunc {
 		c.JSON(http.StatusOK, task)
 	}
 }
+
+// EditTask returns a users task from the DB
+func EditTask(env *Env) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		user, err := env.getUser(c.Request)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "internal server error. Please try later.",
+			})
+			return
+		}
+
+		task_id, err := strconv.Atoi(c.Param("task_id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"detail": "please provide a valid task_id.",
+			})
+			return
+		}
+
+		dateString := c.Query("date")
+		date := time.Now()
+		if dateString != "" {
+			layout := "2006-01-02T15:04:05.000Z"
+			date, err = time.Parse(layout, dateString)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"detail": "please provide a valid date.",
+				})
+				return
+			}
+		}
+
+		edit := &EditTaskModel{}
+		err = c.BindJSON(edit)
+		if err != nil {
+			logrus.Errorf("error binding body: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"detail": "please provide a valid body, expects [name, description, tags]",
+			})
+			return
+		}
+
+		task, err := t.Load(task_id, user.ID, date, env.DB)
+		if err != nil {
+			logrus.Errorf("error loading task: %v", err)
+			switch err {
+			case pgx.ErrNoRows:
+				c.JSON(http.StatusNotFound, gin.H{
+					"detail": "not found.",
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"detail": "failed to get task. please try later",
+				})
+				return
+			}
+		}
+
+		newTask := &t.Task{Name: edit.Name, Description: edit.Description, Tags: edit.Tags}
+		task, err = task.Edit(newTask, date, env.DB)
+		if err != nil {
+			logrus.Errorf("error editing task: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "error editing task. please try later.",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, task)
+	}
+}
