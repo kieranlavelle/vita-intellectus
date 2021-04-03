@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -70,6 +71,18 @@ func getTasks(uid int, c *pgxpool.Pool) ([]*Task, error) {
 	}
 
 	return tasks, err
+}
+
+func completeTask(t *Task, notes string, date time.Time, c *pgxpool.Pool) error {
+	query := `
+		INSERT INTO
+			task_completions (tid, notes, date)
+		VALUES
+			($1, $2, $3)
+	`
+
+	_, err := c.Exec(context.Background(), query, t.ID, notes, date)
+	return err
 }
 
 func checkAbsoluteCompletion(id, d, m, y int, c *pgxpool.Pool) (bool, error) {
