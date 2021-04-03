@@ -104,6 +104,21 @@ func (t *Task) Complete(notes string, date time.Time, c *pgxpool.Pool) (*Task, e
 	return t, err
 }
 
+func (t *Task) UnComplete(date time.Time, c *pgxpool.Pool) (*Task, error) {
+	if t.State != "completed" {
+		err := &DisplayableError{s: fmt.Sprintf("habit not completed on: %v", date)}
+		return t, err
+	}
+
+	err := unCompleteTask(t, date, c)
+	if err != nil {
+		return t, err
+	}
+
+	t.SetState(date, c)
+	return t, err
+}
+
 func (t *Task) SetState(date time.Time, c *pgxpool.Pool) error {
 
 	createdY, createdMonth, createdD := t.DateCreated.Date()

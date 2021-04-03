@@ -25,6 +25,7 @@ func TaskRouter() (*gin.Engine, *pgxpool.Pool) {
 	r.GET("/task/:task_id", GetTask(env))
 	r.GET("/tasks", GetTasks(env))
 	r.PUT("/task/complete/:task_id", CompleteTask(env))
+	r.DELETE("/task/complete/:task_id", UnCompleteTask(env))
 
 	return r, pool
 }

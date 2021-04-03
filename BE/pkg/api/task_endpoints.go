@@ -232,3 +232,74 @@ func CompleteTask(env *Env) gin.HandlerFunc {
 		c.JSON(http.StatusOK, task)
 	}
 }
+
+// UnCompleteTask returns a users task from the DB
+func UnCompleteTask(env *Env) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		user, err := env.getUser(c.Request)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "internal server error. Please try later.",
+			})
+			return
+		}
+
+		task_id, err := strconv.Atoi(c.Param("task_id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"detail": "please provide a valid task_id.",
+			})
+			return
+		}
+
+		dateString := c.Query("date")
+		date := time.Now()
+		if dateString != "" {
+			layout := "2006-01-02T15:04:05.000Z"
+			date, err = time.Parse(layout, dateString)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"detail": "please provide a valid date.",
+				})
+				return
+			}
+		}
+
+		task, err := t.Load(task_id, user.ID, date, env.DB)
+		if err != nil {
+			logrus.Errorf("error loading task: %v", err)
+			switch err {
+			case pgx.ErrNoRows:
+				c.JSON(http.StatusNotFound, gin.H{
+					"detail": "not found.",
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"detail": "failed to get task. please try later",
+				})
+				return
+			}
+		}
+
+		task, err = task.UnComplete(date, env.DB)
+		if err != nil {
+			switch err.(type) {
+			case *t.DisplayableError:
+				c.JSON(http.StatusBadRequest, gin.H{
+					"detail": err.Error(),
+				})
+				return
+			default:
+				logrus.Errorf("failed to complete task: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"detail": "failed to complete task.",
+				})
+				return
+			}
+		}
+
+		c.JSON(http.StatusOK, task)
+	}
+}

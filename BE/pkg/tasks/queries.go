@@ -85,6 +85,27 @@ func completeTask(t *Task, notes string, date time.Time, c *pgxpool.Pool) error 
 	return err
 }
 
+func unCompleteTask(t *Task, date time.Time, c *pgxpool.Pool) error {
+	query := `
+		DELETE FROM
+			task_completions
+		WHERE
+			tid=$1
+		AND
+			date_part('year', date)=$2
+		AND
+			date_part('month', date)=$3
+		AND
+			date_part('day', date)=$4
+	`
+
+	y, mString, d := date.Date()
+	m := int(mString)
+
+	_, err := c.Exec(context.Background(), query, t.ID, y, m, d)
+	return err
+}
+
 func checkAbsoluteCompletion(id, d, m, y int, c *pgxpool.Pool) (bool, error) {
 	query := `
 		SELECT
