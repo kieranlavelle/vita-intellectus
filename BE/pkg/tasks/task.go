@@ -104,6 +104,10 @@ func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, er
 	return filteredTasks, err
 }
 
+func (t *Task) Delete(c *pgxpool.Pool) error {
+	return deleteTask(t, c)
+}
+
 func (t *Task) Edit(newTask *Task, date time.Time, c *pgxpool.Pool) (*Task, error) {
 
 	if newTask.Name != "" {

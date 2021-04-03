@@ -390,3 +390,53 @@ func EditTask(env *Env) gin.HandlerFunc {
 		c.JSON(http.StatusOK, task)
 	}
 }
+
+// DeleteTask returns a users task from the DB
+func DeleteTask(env *Env) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		user, err := env.getUser(c.Request)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "internal server error. Please try later.",
+			})
+			return
+		}
+
+		task_id, err := strconv.Atoi(c.Param("task_id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"detail": "please provide a valid task_id.",
+			})
+			return
+		}
+
+		task, err := t.Load(task_id, user.ID, time.Now(), env.DB)
+		if err != nil {
+			logrus.Errorf("error loading task: %v", err)
+			switch err {
+			case pgx.ErrNoRows:
+				c.JSON(http.StatusNotFound, gin.H{
+					"detail": "not found.",
+				})
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"detail": "failed to get task. please try later",
+				})
+				return
+			}
+		}
+
+		err = task.Delete(env.DB)
+		if err != nil {
+			logrus.Errorf("error when deleting task: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"detail": "failed to delete task. please try later.",
+			})
+			return
+		}
+
+		c.Status(http.StatusOK)
+	}
+}

@@ -144,3 +144,17 @@ func updateTask(t *Task, c *pgxpool.Pool) error {
 	)
 	return err
 }
+
+func deleteTask(t *Task, c *pgxpool.Pool) error {
+	query := `
+		DELETE FROM
+			tasks
+		WHERE
+			id=$1
+		AND
+			uid=$2
+	`
+
+	_, err := c.Exec(context.Background(), query, t.ID, t.UID)
+	return err
+}
