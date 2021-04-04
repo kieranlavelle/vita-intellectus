@@ -16,12 +16,20 @@ function uncompleteTask(token, task_id){
   })
 }
 
-function getTasks(token, filter){
-  return API.get(`tasks?filter=${filter}`, {
-    headers: {
-      Authorization: token,
-    }
-  })
+function getTasks(token, filter, date){
+  if (date != null) {
+    return API.get(`tasks?filter=${filter}&date=${date}`, {
+      headers: {
+        Authorization: token,
+      }
+    })
+  } else {
+    return API.get(`tasks?filter=${filter}`, {
+      headers: {
+        Authorization: token,
+      }
+    })
+  }
 }
 
 function createTask(token, body){

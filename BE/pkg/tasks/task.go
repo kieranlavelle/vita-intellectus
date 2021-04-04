@@ -51,7 +51,19 @@ func New(t *Task, c *pgxpool.Pool) (*Task, error) {
 	// initialise days and tags if they're nil so they're
 	// empty slices instead of nil slices for DB insert
 	if t.Days == nil {
-		t.Days = make([]string, 0)
+		if t.Recurring {
+			t.Days = []string{
+				"monday",
+				"tuesday",
+				"wednesday",
+				"thursday",
+				"friday",
+				"saturday",
+				"sunday",
+			}
+		} else {
+			t.Days = make([]string, 0)
+		}
 	}
 	if t.Tags == nil {
 		t.Tags = make([]string, 0)
@@ -95,6 +107,10 @@ func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, er
 	filteredTasks := make([]*Task, 0)
 	for _, task := range tasks {
 		task.SetState(date, c)
+
+		if task.State == "not-created" {
+			continue
+		}
 
 		if strings.ToLower(filter) == "all" {
 			filteredTasks = append(filteredTasks, task)
@@ -167,57 +183,53 @@ func (t *Task) UnComplete(date time.Time, c *pgxpool.Pool) (*Task, error) {
 func (t *Task) SetState(date time.Time, c *pgxpool.Pool) error {
 
 	createdY, createdMonth, createdD := t.DateCreated.Date()
-	currentY, currentMonth, currentD := time.Now().Date()
+	// currentY, currentMonth, currentD := time.Now().Date()
 	taskY, taskMonth, taskD := t.Date.Date()
 	y, month, d := date.Date()
 
 	createdM := int(createdMonth)
 	taskM := int(taskMonth)
-	currentM := int(currentMonth)
+	// currentM := int(currentMonth)
 	m := int(month)
 
+	// if the passed date comes before the task was created
+	// then the task is not due.
 	if (y < createdY) || (m < createdM) || (d < createdD) {
-		t.State = "not-due"
+		t.State = "not-created"
 		return nil
 	}
 
 	if t.Recurring {
-		weekday := strings.ToLower(date.Weekday().String())
+		day := strings.ToLower(date.Weekday().String())
 
+		// for this task there is an entry in completions on the passed
+		// date for the task so it is completed
 		completed, err := checkAbsoluteCompletion(t.ID, d, m, y, c)
 		if err != nil {
 			return err
-		}
-
-		// for this task there is an entry in completions on the given date
-		// so it is completed
-		if completed {
+		} else if completed {
 			t.State = "completed"
 			return err
 		}
 
-		// if not completed and is/was due then the state is due
-		for _, value := range t.Days {
-
-			// if date == today
-			if (currentY == y) && (currentM == m) && (currentD == d) {
-				if !completed && strings.ToLower(value) == weekday {
+		if helpers.DateEquals(date, time.Now()) {
+			// if not completed and is/was due then the state is due
+			for _, requiredDay := range t.Days {
+				if !completed && strings.ToLower(requiredDay) == day {
 					t.State = "due"
 					return err
 				}
-			} else if (currentY < y) && (currentM < m) && (currentD < d) {
-				t.State = "not-due"
-				return err
-			} else {
-				// it wasn't completed and the date is in the past where
-				// it was due
-				if !completed && strings.ToLower(value) == weekday {
+			}
+		} else if helpers.DateInPast(date, time.Now()) {
+			for _, requiredDay := range t.Days {
+				if !completed && strings.ToLower(requiredDay) == day {
 					t.State = "missed"
 					return err
 				}
 			}
 		}
 
+		t.State = "not-due"
 		return err
 
 	} else {
@@ -254,8 +266,3 @@ func (t *Task) SetState(date time.Time, c *pgxpool.Pool) error {
 
 	return nil
 }
-
-// func Load(id, uid int, c *pgxpool.Pool) (Task, error) {
-
-// 	t := Task{}
-// }

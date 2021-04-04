@@ -3,6 +3,7 @@ package helpers
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
@@ -51,4 +52,19 @@ func Unique(strSlice []string) []string {
 		}
 	}
 	return list
+}
+
+func DateEquals(date1, date2 time.Time) bool {
+	y1, m1, d1 := date1.Date()
+	y2, m2, d2 := date2.Date()
+	return y1 == y2 && m1 == m2 && d1 == d2
+}
+
+func DateInPast(old, new time.Time) bool {
+	yOld, mOld, dOld := old.Date()
+	yNew, mNew, dNew := new.Date()
+
+	oldDate := time.Date(yOld, mOld, dOld, 0, 0, 0, 0, time.UTC)
+	newDate := time.Date(yNew, mNew, dNew, 0, 0, 0, 0, time.UTC)
+	return oldDate.Before(newDate)
 }

@@ -126,7 +126,7 @@ func GetTasks(env *Env) gin.HandlerFunc {
 		dateString := c.Query("date")
 		date := time.Now()
 		if dateString != "" {
-			layout := "2006-01-02T15:04:05.000Z"
+			layout := "2006-01-02"
 			date, err = time.Parse(layout, dateString)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{

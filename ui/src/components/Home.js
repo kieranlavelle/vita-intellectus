@@ -11,6 +11,7 @@ import { getTasks } from '../endpoints'
 import Nav from './Navbar'
 import HomeToolbar from './HomeToolbar'
 import HabitCard from './TaskCard'
+import DateCycler from './DateCycler';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,6 +24,16 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
+const getCurrentDate = () => {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  var yyyy = today.getFullYear();
+  
+  today = yyyy + '-' + mm + '-' + dd;
+  return today
+}
+
 function Home() {
   const classes = useStyles();
   const history = useHistory();
@@ -30,10 +41,11 @@ function Home() {
   const [token, setToken] = usePersistedState('token', '');
   const [tasks, setTasks] = React.useState([]);
   const [filter, setFilter] = React.useState('due');
+  const [date, setDate] = React.useState(getCurrentDate())
 
 
   React.useEffect(() => {
-    getTasks(token, filter)
+    getTasks(token, filter, date ? date : null)
       .then(response => {
         setTasks(response.data.tasks);
       })
@@ -43,7 +55,11 @@ function Home() {
           history.push('/login');
         }
       })
-  }, [filter])
+  }, [filter, date])
+
+  React.useEffect(() => {
+    console.log(`date changed: ${date}`)
+  }, [date])
 
   const onDelete = (id) => {
     const newTasks = [];
@@ -73,6 +89,7 @@ function Home() {
         <div style={{width: '100%'}} className={classes.habits}>
           <Nav />
           <HomeToolbar token={token} onNew={onNew} filter={filter} setFilter={setFilter}/>
+          <DateCycler date={date} setDate={setDate}/>
           <Grid
             container
           >

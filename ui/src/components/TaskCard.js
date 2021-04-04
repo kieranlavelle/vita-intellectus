@@ -194,17 +194,26 @@ function TaskCard(props){
             {name}
           </Typography>
         }
+        // action={
+        //   tags.slice(0, 2).map((value, index) => {
+        //     return <Chip
+        //             className={classes.tagChip}
+        //             key={index}
+        //             size="small"
+        //             color="primary"
+        //             variant="outlined"
+        //             label={value}
+        //           />
+        //   })
+        // }
         action={
-          tags.slice(0, 2).map((value, index) => {
-            return <Chip
-                    className={classes.tagChip}
-                    key={index}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                    label={value}
-                  />
-          })
+          <Chip
+            className={classes.tagChip}
+            size="small"
+            color="primary"
+            variant="outlined"
+            label={state}
+          />
         }
       />
       <Box display="flex" justifyContent="space-evenly" className={classes.statistics}>
