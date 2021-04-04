@@ -89,6 +89,14 @@ function TaskCard(props){
   const [streak, setStreak] = useState(0);
   const [percentage, setPercentage] = useState(0);
 
+  const stateColor = (state) => {
+    if (state == 'not-due') {
+      return '';
+    } else if (state == 'missed') {
+      return 'secondary';
+    }
+    return 'primary'
+  }
 
   const onEdit = (task) => {
     setName(task.name);
@@ -210,7 +218,7 @@ function TaskCard(props){
           <Chip
             className={classes.tagChip}
             size="small"
-            color="primary"
+            color={stateColor(state)}
             variant="outlined"
             label={state}
           />

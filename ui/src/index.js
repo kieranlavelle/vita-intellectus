@@ -14,10 +14,11 @@ const theme = createMuiTheme({
   },
   palette: {
     primary: {
-      main: 'rgb(0, 171, 85)',
+      main: 'rgb(0, 171, 85)'
     },
     secondary: {
-      main: '#ff1744',
+      // main: '#ff1744',
+      main: '#f44336'
     }
   },
 })
