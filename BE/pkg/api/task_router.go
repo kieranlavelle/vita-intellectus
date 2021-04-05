@@ -37,7 +37,7 @@ func TaskRouter() (*gin.Engine, *pgxpool.Pool) {
 	env := &Env{DB: pool}
 
 	r := gin.Default()
-	r.Use(CORSMiddleware())
+	// r.Use(CORSMiddleware())
 
 	r.POST("/task", AddTask(env))
 	r.GET("/task/:task_id", GetTask(env))
