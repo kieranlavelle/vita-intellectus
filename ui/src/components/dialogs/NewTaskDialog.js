@@ -16,9 +16,9 @@ import Switch from '@material-ui/core/Switch';
 import AddIcon from '@material-ui/icons/Add';
 import { makeStyles } from '@material-ui/core/styles';
 
-import ChipInput from './ChipInput';
-import DayPicker from './DayPicker'
-import { createTask } from '../endpoints';
+import ChipInput from '../sub_components/ChipInput';
+import DayPicker from '../sub_components/DayPicker';
+import { createTask } from '../../endpoints';
 
 const useStyles = makeStyles((theme) => ({
   chips: {
@@ -67,7 +67,7 @@ function NewTaskDialog(props){
     }
     createTask(props.token, task)
       .then(response => {
-        props.onClose(response.data);
+        props.onClose(task);
         setOpen(false);
       })
       .catch(error => {

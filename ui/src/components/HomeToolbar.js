@@ -7,7 +7,9 @@ import Switch from '@material-ui/core/Switch';
 import Box from '@material-ui/core/Box';
 
 
-import NewTaskDialog from './NewTaskDialog'
+import NewTaskDialog from './dialogs/NewTaskDialog';
+import DateCycler from './sub_components/DateCycler';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 function HomeToolbar(props){
 
   const classes = useStyles();
-  const {filter, setFilter} = props;
+  const {filter, setFilter, date, setDate} = props;
 
   const onClose = (value) => {
     props.onNew(value);
@@ -30,23 +32,33 @@ function HomeToolbar(props){
     <Box
       className={classes.root}
       display="flex"
-      flexDirection="row"
-      justifyContent="space-between"
+      flexDirection="col"
+      alignContent="start"
     >
-      <NewTaskDialog onClose={onClose} token={props.token}/>
-      <FormGroup row>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={filter == 'due'}
-              onChange={() => setFilter(filter === 'due' ? 'all' : 'due')}
-              name="filter"
-              color="primary"
-            />
-          }
-          label="Don't show not-due tasks."
-        />
-      </FormGroup>
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+        width="100%"
+      >
+        <NewTaskDialog onClose={onClose} token={props.token}/>
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={filter == 'due'}
+                onChange={() => setFilter(filter === 'due' ? 'all' : 'due')}
+                name="filter"
+                color="primary"
+              />
+            }
+            label="Don't show not-due tasks."
+          />
+        </FormGroup>
+      </Box>
+      <Box>
+        <DateCycler date={date} setDate={setDate}/>
+      </Box>
     </Box>
   )
 }

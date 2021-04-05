@@ -12,9 +12,9 @@ import Alert from '@material-ui/lab/Alert';
 
 import { createMuiTheme, useTheme, ThemeProvider } from '@material-ui/core/styles';
 
-import { AUTH } from '../http'
-import usePersistedState from '../utilities'
-import loginLogo from '../login.svg';
+import { AUTH } from '../../http'
+import usePersistedState from '../../utilities'
+import loginLogo from '../../login.svg';
 
 const theme = createMuiTheme({
   typography: {

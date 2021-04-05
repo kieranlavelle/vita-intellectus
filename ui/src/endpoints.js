@@ -49,7 +49,7 @@ function editHabit(token, body, habitID){
 }
 
 function deleteTask(token, taskID) {
-  return API.delete(`task/${habitID}`, {
+  return API.delete(`task/${taskID}`, {
     headers: {
       Authorization: token,
     }

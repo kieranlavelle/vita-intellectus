@@ -3,10 +3,13 @@ import React, { useState, useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 
 import Chip from '@material-ui/core/Chip';
+import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
+
+
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -15,7 +18,7 @@ import EditIcon from '@material-ui/icons/Edit';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import EditHabitDialog from './EditHabitDialog'
+import EditHabitDialog from './dialogs/EditHabitDialog';
 import { completeTask, deleteTask } from '../endpoints';
 
 
@@ -64,9 +67,10 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: '10px'
   },
   tagChip: {
-    margin: '5px'
+    margin: '5px',
   }
 }))
+
 
 function TaskCard(props){
 
@@ -81,8 +85,8 @@ function TaskCard(props){
 
   const [name, setName] = useState(props.name);
   const [description, setDescription] = useState(props.description)
-  const [state, setCompleted] = useState(props.state);
-  const [tags, setTags] = useState(props.tags);
+  const [state, setState] = useState(props.state);
+  const [tags, setTags] = useState(props.tags ? props.tags : []);
   const [days, setDays] = useState(props.days);
   const [date, setDate] = useState(props.days)
 
@@ -91,7 +95,7 @@ function TaskCard(props){
 
   const stateColor = (state) => {
     if (state == 'not-due') {
-      return '';
+      return 'default';
     } else if (state == 'missed') {
       return 'secondary';
     }
@@ -107,7 +111,7 @@ function TaskCard(props){
   const onComplete = () => {
     completeTask(props.token, props.id).then(
       response => {
-        setCompleted(true);
+        setState('completed');
       }
     )
     .catch(error => {
@@ -118,7 +122,7 @@ function TaskCard(props){
   const onDelete = () => {
     deleteTask(props.token, props.id).then(
       response => {
-        props.onDeleteHabit(props.id);
+        props.onDelete(props.id);
       }
     )
     .catch(error => {
@@ -130,57 +134,86 @@ function TaskCard(props){
 
     return (
         <CardActions className={classes.actions}>
-          <Box
-            display="flex"
-            justifyContent="space-evenly"
+          <Grid
+            container
             width='100%'
+            direction='column'
+            alignItems='center'
           >
-            <div>
-              <IconButton
-                className={classes['MuiIconButton-root']}
-                onMouseEnter={() => sethoverDelete(true)}
-                onMouseLeave={() => sethoverDelete(false)}
-                onClick={onDelete}
+            <Grid item lg={12} md={12}>
+              {tags.map((value, index) => {
+                return <Chip
+                        className={classes.tagChip}
+                        key={index}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                        label={value}
+                      />
+              })}
+              {tags.length == 0 ? (<Chip
+                      className={classes.tagChip}
+                      size="small"
+                      variant="outlined"
+                      label="no-tags"
+                    />) : <span></span>
+              }
+            </Grid>
+            <Grid container item lg={12} md={12} sm={12}>
+              <Box
+                display="flex"
+                flexDirection='row'
+                justifyContent="space-evenly"
+                width='100%'
               >
-                <DeleteIcon
-                  className={hoverDelete ? classes.hoverDelete : classes.delete}
-                />
-              </IconButton>
-            </div>
-            <div>
-              <IconButton
-                className={classes['MuiIconButton-root']}
-                onMouseEnter={() => setHoverTick(true)}
-                onMouseLeave={() => setHoverTick(false)}
-                onClick={onComplete}
-              >
-                <DoneIcon
-                  className={(hoverTick || state === 'completed') ? classes.hoverTick : classes.tick}
-                />
-              </IconButton>
-            </div>
-            <div>
-              <IconButton
-                className={classes['MuiIconButton-root']}
-                onMouseEnter={() => setHoverEdit(true)}
-                onMouseLeave={() => setHoverEdit(false)}
-                onClick={() => setEditHabit(true)}
-              >
-                <EditIcon
-                  className={hoverEdit ? classes.hoverEdit : classes.edit}
-                />
-              </IconButton>
-              <EditHabitDialog
-                open={editTask}
-                setOpen={setEditTask}
-                currentDays={days}
-                currentTags={tags}
-                name={name}
-                onEdit={onEdit}
-                {...props}
-              />
-            </div>
-          </Box>
+                <div>
+                  <IconButton
+                    className={classes['MuiIconButton-root']}
+                    onMouseEnter={() => sethoverDelete(true)}
+                    onMouseLeave={() => sethoverDelete(false)}
+                    onClick={onDelete}
+                  >
+                    <DeleteIcon
+                      className={hoverDelete ? classes.hoverDelete : classes.delete}
+                    />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton
+                    className={classes['MuiIconButton-root']}
+                    onMouseEnter={() => setHoverTick(true)}
+                    onMouseLeave={() => setHoverTick(false)}
+                    onClick={onComplete}
+                  >
+                    <DoneIcon
+                      className={(hoverTick || state === 'completed') ? classes.hoverTick : classes.tick}
+                    />
+                  </IconButton>
+                </div>
+                <div>
+                  <IconButton
+                    className={classes['MuiIconButton-root']}
+                    onMouseEnter={() => setHoverEdit(true)}
+                    onMouseLeave={() => setHoverEdit(false)}
+                    onClick={() => setEditHabit(true)}
+                  >
+                    <EditIcon
+                      className={hoverEdit ? classes.hoverEdit : classes.edit}
+                    />
+                  </IconButton>
+                  <EditHabitDialog
+                    open={editTask}
+                    setOpen={setEditTask}
+                    currentDays={days}
+                    currentTags={tags}
+                    name={name}
+                    onEdit={onEdit}
+                    {...props}
+                  />
+                </div>
+              </Box>
+            </Grid>
+          </Grid>
       </CardActions>
     )
   }
@@ -202,25 +235,13 @@ function TaskCard(props){
             {name}
           </Typography>
         }
-        // action={
-        //   tags.slice(0, 2).map((value, index) => {
-        //     return <Chip
-        //             className={classes.tagChip}
-        //             key={index}
-        //             size="small"
-        //             color="primary"
-        //             variant="outlined"
-        //             label={value}
-        //           />
-        //   })
-        // }
         action={
           <Chip
             className={classes.tagChip}
             size="small"
-            color={stateColor(state)}
             variant="outlined"
             label={state}
+            color={stateColor(state)}
           />
         }
       />

@@ -11,15 +11,11 @@ import TextField from '@material-ui/core/TextField';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import ChipInput from './ChipInput'
-import DayPicker from './DayPicker'
-import { editHabit } from '../endpoints';
+import ChipInput from '../sub_components/ChipInput';
+import DayPicker from '../sub_components/DayPicker';
+import { editHabit } from '../../endpoints';
 
 const useStyles = makeStyles((theme) => ({
-  chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   chip: {
     margin: 2,
   },

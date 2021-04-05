@@ -106,6 +106,13 @@ func Tasks(uid int, filter string, date time.Time, c *pgxpool.Pool) ([]*Task, er
 
 	filteredTasks := make([]*Task, 0)
 	for _, task := range tasks {
+
+		// if this is a fixed date task and the passed date is not
+		// the required task date then skip it
+		if !task.Recurring && !helpers.DateEquals(task.Date, date) {
+			continue
+		}
+
 		task.SetState(date, c)
 
 		if task.State == "not-created" {

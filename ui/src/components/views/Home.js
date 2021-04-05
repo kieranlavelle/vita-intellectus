@@ -5,13 +5,12 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import usePersistedState from '../utilities';
-import { getTasks } from '../endpoints'
+import usePersistedState from '../../utilities';
+import { getTasks } from '../../endpoints';
 
-import Nav from './Navbar'
-import HomeToolbar from './HomeToolbar'
-import HabitCard from './TaskCard'
-import DateCycler from './DateCycler';
+import Nav from '../Navbar';
+import HomeToolbar from '../HomeToolbar';
+import HabitCard from '../TaskCard';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,10 +56,6 @@ function Home() {
       })
   }, [filter, date])
 
-  React.useEffect(() => {
-    console.log(`date changed: ${date}`)
-  }, [date])
-
   const onDelete = (id) => {
     const newTasks = [];
     tasks.forEach((val, index) => {
@@ -88,8 +83,14 @@ function Home() {
       >
         <div style={{width: '100%'}} className={classes.habits}>
           <Nav />
-          <HomeToolbar token={token} onNew={onNew} filter={filter} setFilter={setFilter}/>
-          <DateCycler date={date} setDate={setDate}/>
+          <HomeToolbar
+            token={token}
+            onNew={onNew}
+            filter={filter}
+            setFilter={setFilter}
+            date={date}
+            setDate={setDate}
+          />
           <Grid
             container
           >

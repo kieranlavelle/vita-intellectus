@@ -1,6 +1,5 @@
 import React, { useEffect } from "react"
 import {
-    BrowserRouter,
     HashRouter,
     Switch,
     Route,
@@ -8,9 +7,9 @@ import {
 } from "react-router-dom"
 
 import usePersistedState from '../utilities'
-import Home from './Home'
-import Login from './Login'
-import Register from './Register'
+import Home from './views/Home';
+import Login from './views/Login'
+import Register from './views/Register'
 
 function ProtectedRoute(props){
     let authorized = (
