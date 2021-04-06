@@ -49,7 +49,9 @@ function Home() {
         setTasks(response.data.tasks);
       })
       .catch(error => {
-        if (error.response.status === 401) {
+        console.log(error)
+        const response = error.response;
+        if (response.status === 401) {
           setToken('');
           history.push('/login');
         }

@@ -18,6 +18,7 @@ import EditIcon from '@material-ui/icons/Edit';
 
 import { makeStyles } from '@material-ui/core/styles';
 
+import ViewTaskDialog from './dialogs/ViewTaskDialog';
 import EditHabitDialog from './dialogs/EditHabitDialog';
 import { completeTask, deleteTask } from '../endpoints';
 
@@ -82,6 +83,7 @@ function TaskCard(props){
   const [hoverDelete, sethoverDelete] = useState(false);
 
   const [editTask, setEditTask] = useState(false);
+  const [viewTask, setViewTask] = useState(false);
 
   const [name, setName] = useState(props.name);
   const [description, setDescription] = useState(props.description)
@@ -89,9 +91,11 @@ function TaskCard(props){
   const [tags, setTags] = useState(props.tags ? props.tags : []);
   const [days, setDays] = useState(props.days);
   const [date, setDate] = useState(props.days)
+  
+  const {recurring} = props;
 
-  const [streak, setStreak] = useState(0);
-  const [percentage, setPercentage] = useState(0);
+  const streak = 0;
+  const percentage = 0
 
   const stateColor = (state) => {
     if (state == 'not-due') {
@@ -128,6 +132,11 @@ function TaskCard(props){
     .catch(error => {
       alert("failed to complete habit.")
     })
+  }
+
+  const onClick = (event) => {
+    setViewTask(true);
+    console.log(viewTask)
   }
 
   const Actions = () => {
@@ -226,7 +235,16 @@ function TaskCard(props){
       onMouseEnter={() => setElevation(10)}
       onMouseLeave={() => setElevation(5)}
     >
+      <ViewTaskDialog
+        open={viewTask}
+        setOpen={setViewTask}
+        name={name}
+        description={description}
+        days={days}
+        recurring={recurring}
+      />
       <CardHeader
+        onClick={onClick}
         title={
           <Typography
             className={classes.habitTitle}
@@ -245,7 +263,12 @@ function TaskCard(props){
           />
         }
       />
-      <Box display="flex" justifyContent="space-evenly" className={classes.statistics}>
+      <Box
+        onClick={onClick}
+        display="flex"
+        justifyContent="space-evenly"
+        className={classes.statistics}
+      >
         <div>
           <Typography
             style={{fontWeight: 600}}

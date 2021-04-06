@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ChipInput = (props) => {
 
-  const { onChange } = props;
+  const { onChange, disabled } = props;
   const classes = useStyles();
   const [value, setValue] = useState('');
   const [tags, setTags] = useState(props.tags ? props.tags : []);
@@ -60,6 +60,7 @@ const ChipInput = (props) => {
                     size="small"
                     color="primary"
                     variant="outlined"
+                    disabled={disabled}
                     label={value}
                   />
           })
@@ -72,6 +73,7 @@ const ChipInput = (props) => {
         color="primary"
         margin="dense"
         fullWidth
+        disabled={disabled}
         onChangeCapture={(e) => setValue(e.target.value)}
         onKeyPress={handleKeyPress}
       />

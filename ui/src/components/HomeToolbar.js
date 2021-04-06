@@ -46,13 +46,13 @@ function HomeToolbar(props){
           <FormControlLabel
             control={
               <Switch
-                checked={filter == 'due'}
+                checked={filter == 'all'}
                 onChange={() => setFilter(filter === 'due' ? 'all' : 'due')}
                 name="filter"
                 color="primary"
               />
             }
-            label="Don't show not-due tasks."
+            label="Show not-due."
           />
         </FormGroup>
       </Box>

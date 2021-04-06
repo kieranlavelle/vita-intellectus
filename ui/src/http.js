@@ -8,7 +8,7 @@ const AUTH = axios.create({
 
 const API = axios.create({
     baseURL: 'https://gateway.node404.com/vita/',
-    timeout: 1000,
+    timeout: 2000,
     headers: {}
 });
 
