@@ -9,6 +9,7 @@ services:
             - 8004:8004
         environment: 
             DB_CONNECTION_STRING: postgres://username:password@postgres-db:5432/vita
+            ENV: PROD
         networks:
             - backend-network
     

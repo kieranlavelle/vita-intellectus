@@ -377,7 +377,7 @@ func EditTask(env *Env) gin.HandlerFunc {
 			}
 		}
 
-		newTask := &t.Task{Name: edit.Name, Description: edit.Description, Tags: edit.Tags}
+		newTask := &t.Task{Name: edit.Name, Description: edit.Description}
 		task, err = task.Edit(newTask, date, env.DB)
 		if err != nil {
 			logrus.Errorf("error editing task: %v", err)

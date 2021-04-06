@@ -9,35 +9,12 @@ import (
 	"github.com/kieranlavelle/vita-intellectus/pkg/helpers"
 )
 
-func weekdayToString(weekday int) string {
-	switch weekday {
-	case 1:
-		return "monday"
-	case 2:
-		return "tuesday"
-	case 3:
-		return "wednesday"
-	case 4:
-		return "thursday"
-	case 5:
-		return "friday"
-	case 6:
-		return "saturday"
-	case 7:
-		return "sunday"
-	}
-
-	// this is a bad idea but CBA
-	return "monday"
-}
-
 // Tast represents a task a user owns
 type Task struct {
 	ID          int                    `json:"id"`
 	UID         int                    `json:"user_id"`
 	Name        string                 `json:"name"`
 	State       string                 `json:"state"`
-	Tags        []string               `json:"tags"`
 	Description string                 `json:"description"`
 	Recurring   bool                   `json:"recurring"`
 	Days        []string               `json:"days,omitempty"`
@@ -63,14 +40,6 @@ func New(t *Task, c *pgxpool.Pool) (*Task, error) {
 			}
 		} else {
 			t.Days = make([]string, 0)
-		}
-	}
-	if t.Tags == nil {
-		t.Tags = make([]string, 0)
-	} else {
-		if len(t.Tags) != len(helpers.Unique(t.Tags)) {
-			err := &DisplayableError{s: "tags must be unique"}
-			return t, err
 		}
 	}
 
@@ -139,12 +108,6 @@ func (t *Task) Edit(newTask *Task, date time.Time, c *pgxpool.Pool) (*Task, erro
 		t.Name = newTask.Name
 	}
 
-	if newTask.Tags == nil {
-		t.Tags = make([]string, 0)
-	} else if len(newTask.Tags) == len(helpers.Unique(newTask.Tags)) {
-		t.Tags = newTask.Tags
-	}
-
 	t.Description = newTask.Description
 
 	err := updateTask(t, c)
@@ -190,13 +153,9 @@ func (t *Task) UnComplete(date time.Time, c *pgxpool.Pool) (*Task, error) {
 func (t *Task) SetState(date time.Time, c *pgxpool.Pool) error {
 
 	createdY, createdMonth, createdD := t.DateCreated.Date()
-	// currentY, currentMonth, currentD := time.Now().Date()
-	taskY, taskMonth, taskD := t.Date.Date()
 	y, month, d := date.Date()
 
 	createdM := int(createdMonth)
-	taskM := int(taskMonth)
-	// currentM := int(currentMonth)
 	m := int(month)
 
 	// if the passed date comes before the task was created
@@ -246,30 +205,26 @@ func (t *Task) SetState(date time.Time, c *pgxpool.Pool) error {
 			return err
 		}
 
-		// task isnt due
-		if (y > taskY) || (m > taskM) || (d > taskD) {
-			t.State = "not-due"
-			return err
-		}
-
 		// task is completed
 		if completed {
 			t.State = "completed"
 			return err
 		}
 
-		// task is due
-		if (taskY == y) && (taskM == m) && (taskD == d) {
+		if helpers.DateEquals(t.Date, time.Now()) {
+			// if not completed and is/was due then the state is due
 			t.State = "due"
 			return err
-		}
-
-		// task was missed
-		if (y < taskY) || (m < taskM) || (d < taskD) {
+		} else if helpers.DateInPast(date, time.Now()) {
 			t.State = "missed"
 			return err
 		}
-	}
 
-	return nil
+		t.State = "not-due"
+		return err
+	}
+}
+
+func (t *Task) numCompletions(date time.Time, c *pgxpool.Pool) (int, error) {
+	return getNumCompletions(t, date, c)
 }
